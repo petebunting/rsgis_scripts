@@ -11,7 +11,7 @@
 # 20/02/2012
 #######################################
 
-import os, sys, optparse, subprocess, re, glob
+import os, sys, optparse, subprocess, re, glob, pp
 
 class BatchRunCommand (object):
     def findExtension(self, filename, ext):
@@ -57,6 +57,9 @@ class BatchRunCommand (object):
                 inULon = line.strip()
             i+=1
         
+        inULat = str(int(inULat) * 3600)
+        inULon = str(int(inULon) * 3600)
+
         headerText = '''ENVI
 description = {
  %s}
@@ -82,11 +85,12 @@ wavelength units = Unknown
         
         return inHHFile, inHVFile
 
-    def createStack(self, inFile):
+    def createStack(self, inFile, inSceneDIR, xmlFileList):
     
-        inXMLFile = inFile + '_stack.xml'
+        inXMLFile = inSceneDIR + '/' + inFile + '_stack.xml'
         inXML = open(inXMLFile, 'w')
-    
+        inFilePath = inSceneDIR + '/' + inFile   
+ 
         xmlText = '''<?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Description:
@@ -133,29 +137,50 @@ wavelength units = Unknown
 
     <!-- Create KML -->
     <rsgis:command algor="commandline" option="execute" command="gdal2tiles.py -k IMAGE_vrt.vrt IMAGE_kml/" />
-    
+
 </rsgis:commands>'''
-        xmlText = re.sub('IMAGE',inFile, xmlText)
+        xmlText = re.sub('IMAGE',inFilePath, xmlText)
         inXML.write(xmlText)
         inXML.close()
         
+        os.chdir(inSceneDIR)
         runXML = 'rsgisexe -x ' + inXMLFile
-        os.system(runXML)
-    
+        xmlFileList.append(inXMLFile)
+        #os.system(runXML)
+   
+    def runSingleCommand(self, command):
+        import subprocess
+        out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (stdout, stderr) = out.communicate()
+        print stdout
+        print stderr
 
     def run(self, inDIR):
         filelist = []
+        xmlFileList = [] # Create list for XML files
         os.chdir(inDIR)
         fileList = glob.glob('KC*') #os.listdir(inDIR)
         
         for fileName in fileList:
             print fileName
             inFile = fileName
-            baseFile = re.sub('\.tar\.gz','',fileName)
-            self.unTar(inDIR, baseFile)
+            baseFile = fileName #re.sub('\.tar\.gz','',fileName)
+            #self.unTar(inDIR, baseFile)
             inHHFile, inHVFile = self.createHeader(inDIR + '/' + baseFile + '/')
-            inBaseFile =  inDIR + '/' + baseFile + '/' + re.sub('_HH','',inHHFile)
-            self.createStack(inBaseFile)
+            inSceneDIR =  inDIR + '/' + baseFile + '/' 
+            inBaseFile = re.sub('_HH','',inHHFile)
+            self.createStack(inBaseFile, inSceneDIR, xmlFileList)
+    
+        # Excecute XML
+        jobs = []
+        job_server = pp.Server(ncpus=4) # Set up jobserver
+        for xmlFile in xmlFileList: # Add xmlfiles to jobserver
+            #os.system('rsgisexe -x ' + xmlFile)
+            jobs.append(job_server.submit(self.runSingleCommand,('rsgisexe -x ' + xmlFile,),modules=("subprocess",)))
+
+        for job in jobs: # Run jobs
+            job()
+
 
 if __name__ == '__main__':
     obj = BatchRunCommand()
