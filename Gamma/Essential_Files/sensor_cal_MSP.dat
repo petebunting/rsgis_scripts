@@ -1,0 +1,34 @@
+#MSP absolute radiometric calibration constants for azimuth compression
+#v1.1 clw/ms 02-Jun-2009
+#sensor      mode   pol. inc.angle start_date  end_date  cal.const (dB)
+########################################################################
+ERS1          -      VV    20.35    19910717    19961231    -10.3
+ERS1          -      VV    20.35    19970101    20000310    -12.5    
+ERS2          -      VV    20.35    19950421    -           -2.8
+ASAR          IS1    VV    18.95    20020301    -           -
+ASAR          IS2    VV    22.95    20020301    -           -30.4 
+ASAR          IS3    VV    28.70    20020301    -           -
+ASAR          IS4    VV    33.65    20020301    -           -
+ASAR          IS5    VV    37.60    20020301    -           -
+ASAR          IS6    VV    40.95    20020301    -           -
+ASAR          IS7    VV    43.85    20020301    -           -
+JERS-1        -      HH    35.21    19920211    19981011    -22.1
+RADARSAT-1    F1     VV    34.10    19911105    -           -
+RADARSAT-1    F2     VV    35.05    19911105    -           -
+RADARSAT-1    F3     VV    37.29    19911105    -           -
+RADARSAT-1    F4     VV    38.76    19911105    -           -
+RADARSAT-1    S1     VV    20.41    19911105    -           -
+RADARSAT-1    S2     VV    24.476   19911105    -           -
+RADARSAT-1    S3     VV    29.536   19911105    -           -
+RADARSAT-1    S4     VV    31.836   19911105    -           -
+PALSAR        FBS    HH    21.5     20060124    20061023    -48.3
+PALSAR        FBS    HH    34.3     20060124    -           -51.9
+PALSAR        FBS    HH    41.5     20060124    20061023    -
+PALSAR        FBD    HH    34.3     20060124    -           -51.8
+PALSAR        FBD    HV    34.3     20060124    -           -58.3
+PALSAR        FBD    HH    41.5     20060124    20061023    -
+PALSAR        FBD    HV    41.5     20060124    20061023    -
+PALSAR        POL    HH    21.5     20060124    -           -45.4
+PALSAR        POL    HV    21.5     20060124    -           -53.6
+PALSAR        POL    VH    21.5     20060124    -           -54.5
+PALSAR        POL    VV    21.5     20060124    -           -43.9

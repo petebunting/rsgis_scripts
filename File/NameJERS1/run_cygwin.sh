@@ -1,0 +1,1 @@
+/cygdrive/c/Program\ Files/Cygwin/bin/python.exe /cygdrive/d/Temp/NameJERS1/DIRCopyNameJERS1outParFile.py  /cygdrive/y/ /cygdrive/d/Temp/jers1out/ /cygdrive/d/Temp/outparfile.txt new

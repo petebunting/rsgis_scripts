@@ -1,0 +1,1 @@
+python /Volumes/Data/JERS1/NameJERS1/DIRCopyNameJERS1outParFile.py  /Volumes/JAXA_EOC/  /Volumes/Data/JERS1/outfolder/ /Volumes/Data/JERS1/jers1database_danmac.txt append

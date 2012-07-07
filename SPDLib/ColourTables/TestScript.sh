@@ -1,0 +1,1 @@
+python /Users/pete/Documents/Research/Development/scenzgrid/rsgisscripts/trunk/SPDLib/CSVClrTab2Cpp.py -i /Users/pete/Documents/Research/Development/scenzgrid/rsgisscripts/trunk/OddsAndEnds/ENVI_Colour_Tables/16_level.csv -o /Users/pete/Desktop/16_level.cpp

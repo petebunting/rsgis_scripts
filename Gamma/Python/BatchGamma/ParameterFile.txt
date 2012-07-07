@@ -1,0 +1,9 @@
+rawSLCTemplate = scriptsPath + '/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/Australia/FBD_raw_to_SLC_Australia_template.csh'
+slcGeoTemplate = scriptsPath + '/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/Australia/FBD_SLC_to_GEO_Australia_template.csh'
+srtm = '/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif'
+pan = '/data/Australia/Basedata/LandsatPan/NILband8.ers'
+utmProjFile = '/data/home/ddc06/Documents/Development/Gamma/Projection/utm_z54.wkt'
+DEMResolution = 30
+SubsetDEM = True
+SubsetPAN = True
+GenerateAlphaEntropy = False

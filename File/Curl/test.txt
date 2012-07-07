@@ -1,0 +1,10 @@
+http://download.osgeo.org/gdal/gdal160RC1.zip
+http://download.osgeo.org/gdal/gdal-1.6.0RC1.tar.gz
+http://download.osgeo.org/gdal/gdalautotest-1.6.0.tar.gz
+http://download.osgeo.org/gdal/gdalautotest-1.6.0.zip
+http://download.osgeo.org/gdal/gdal153.zip
+http://download.osgeo.org/gdal/gdal-1.5.3.tar.gz
+http://download.osgeo.org/gdal/gdal152.zip
+http://download.osgeo.org/gdal/gdal-1.5.2.tar.gz
+http://download.osgeo.org/gdal/gdal151.zip
+http://download.osgeo.org/gdal/gdal-1.5.1.tar.gz

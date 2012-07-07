@@ -1,0 +1,1 @@
+spdbatchgen.py /Users/pete/Documents/Research/Development/scenzgrid/rsgisscripts/trunk/OddsAndEnds/ENVI_Colour_Tables .csv /Users/pete/Temp/cppClrTabs/ /Users/pete/Documents/Research/Development/scenzgrid/rsgisscripts/trunk/SPDLib/ConvertAllClrTabs.sh /Users/pete/Documents/Research/Development/scenzgrid/rsgisscripts/trunk/SPDLib/BatchTemplate.sh --recurse=no

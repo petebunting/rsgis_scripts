@@ -1,0 +1,1 @@
+/cygdrive/c/Cygwin/bin/python.exe /cygdrive/d/JERS1/NameJERS1/DIRCopyNameJERS1outParFile.py  /cygdrive/e/ /cygdrive/d/JERS1/outfolder/ /cygdrive/d/JERS1/jers1database_pc2007.txt new
