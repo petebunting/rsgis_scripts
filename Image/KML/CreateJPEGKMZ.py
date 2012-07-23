@@ -34,13 +34,12 @@ class CreateJPEGKMZ(object):
         if photoInfo["GPSInfo"][2][0][1] == 0:
             print "No GeoInfo for: " + inImageFile
         else:
-            # Create directory (to be zipped)
-
-            # Create quicklook image
+            # Create quicklook image (using imagemagick)
             qlImage = imageBaseName + '_ql.png'
             convertCommand = 'convert ' + os.path.join(inDIR, image) + ' -resize 600 400 ' + os.path.join(inDIR, qlImage)
-
-            os.system(convertCommand)   
+            os.system(convertCommand)
+            
+            # Get coordinated from photo   
             northSouth = photoInfo["GPSInfo"][1]
             northingDeg = photoInfo["GPSInfo"][2][0][0] / photoInfo["GPSInfo"][2][0][1]
             northingMin = photoInfo["GPSInfo"][2][1][0] / photoInfo["GPSInfo"][2][1][1]
