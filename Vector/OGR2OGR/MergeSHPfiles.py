@@ -61,9 +61,7 @@ class MergeSHPfiles (object):
         
     
     # A function which iterates through the directory and checks file extensions
-    def findFilesExt(self, directory, extension):
-        # Define a list to store output list of files
-        fileList = list()
+    def findFilesExt(self, directory, extension, fileList):
         # check whether the current directory exits
         if os.path.exists(directory):
             # check whether the given directory is a directory
@@ -74,40 +72,36 @@ class MergeSHPfiles (object):
                 for filename in dirFileList:
                     # Check whether file is directory or file
                     if(os.path.isdir(os.path.join(directory,filename))):
-                        print os.path.join(directory,filename) + \
-                        ' is a directory and therefore ignored!'
-                    elif(os.path.isfile(os.path.join(directory,filename))):
-                        if(self.checkFileExtension(filename, extension)):
-                            fileList.append(os.path.join(directory,filename))
-                    else:
-                        print filename + ' is NOT a file or directory!'
+                        self.findFilesExt(os.path.join(directory,filename), extension, fileList)
+                    elif(self.checkFileExtension(filename, extension)):
+                        fileList.append(os.path.join(directory,filename))
             else:
                 print directory + ' is not a directory!'
         else:
             print directory + ' does not exist!'
-        # Return the list of files
-        return fileList
 
     # A function to control the merging of shapefiles
     def mergeSHPfiles(self, filePath, newSHPfile):
         # Get the list of files within the directory
         # provided with the extension .shp
-       fileList = self.findFilesExt(filePath, '.shp')
+       fileList = list()
+       self.findFilesExt(filePath, '.shp', fileList)
        # Variable used to identify the first file
        first = True
        # A string for the command to be built
        command = ''
        # Iterate through the files.
        for file in fileList:
+           print "Adding:" + file 
            if first:
                # If the first file make a copy to create the output file
-               command = 'ogr2ogr ' + newSHPfile + ' ' + file
+               command = 'ogr2ogr ' + newSHPfile + ' "' + file + '"'
                first = False
            else:
                # Otherwise append the current shapefile to the output file
-               command = 'ogr2ogr -update -append ' + newSHPfile + ' '  + \
-               file + ' -nln ' + \
-               self.removeSHPExtension(self.removeFilePathWINS(newSHPfile))
+               command = 'ogr2ogr -update -append ' + newSHPfile + ' "'  + \
+               file + '" -nln ' + \
+               self.removeSHPExtension(self.removeFilePath(newSHPfile))
            # Execute the current command
            os.system(command)
 
