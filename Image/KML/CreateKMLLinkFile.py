@@ -94,7 +94,9 @@ class CreateKMLLinkFile (object):
             self.help()
 
     def help(self):
-        print 'python CreateKMLLinkFile.py <inputDIR> <outputFile> <input_Extension> <output_Path> <Name>'
+        print ''' Create KML linker file for individual files
+Usage:
+    python CreateKMLLinkFile.py <inputDIR> <outputFile> <input_Extension> <output_Path> <Name>'''
 
 if __name__ == '__main__':    
     obj = CreateKMLLinkFile()

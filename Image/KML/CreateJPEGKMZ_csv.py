@@ -25,11 +25,13 @@ class CreateJPEGKMZ(object):
         inImageFile = os.path.join(inDIR, image)
         
         foundGeo = False
+        imageGeoLine = []
 
         # Find lat long in XYLocationsFile
         inXYLocations = csv.reader(open(inXYLocationsFile,'rU'))
         for line in inXYLocations:
             if line[0].strip() == imageBaseName:
+                imageGeoLine = line
                 foundGeo = True      
 
         if foundGeo == False:
@@ -40,8 +42,8 @@ class CreateJPEGKMZ(object):
             convertCommand = 'convert ' + os.path.join(inDIR, image) + ' -resize 600 400 ' + os.path.join(inDIR, qlImage)
             os.system(convertCommand)
             
-            eastingDDStr = str(line[2])
-            nortingDDStr = str(line[1])
+            eastingDDStr = str(imageGeoLine[2])
+            nortingDDStr = str(imageGeoLine[1])
             
             outKMLName = imageBaseName + '_kml.kml'
             outKMLFile = os.path.join(inDIR, outKMLName)
@@ -84,7 +86,10 @@ class CreateJPEGKMZ(object):
             self.createKMZFile(inDIR, image, inXYLocationsFile)
     
     def help(self):
-        print 'python CreateJPEGKMZ.py inDIR'
+        print '''Create KMZ file for photos where location is stored in CSV file in the form:
+PhotoName, Lat, Long        
+Usage:
+        python CreateJPEGKMZ.py inDIR inXYLocationsFile'''
 
 if __name__ == '__main__':
     obj = CreateJPEGKMZ()
