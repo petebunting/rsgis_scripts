@@ -23,6 +23,7 @@ class CreateJPEGKMZ(object):
     def createKMZFile(self, inDIR, image, outXY):
         os.chdir(inDIR) # Change into input directory (for zipping files)
         imageBaseName = re.sub('\.JPG','',image.upper())
+        imageBaseName = re.sub('\s','_',imageBaseName)
         inImageFile = os.path.join(inDIR, image)
         inPhoto = Image.open(inImageFile)
         info = inPhoto._getexif()
@@ -36,7 +37,7 @@ class CreateJPEGKMZ(object):
         else:
             # Create quicklook image (using imagemagick)
             qlImage = imageBaseName + '_ql.png'
-            convertCommand = 'convert ' + os.path.join(inDIR, image) + ' -resize 600 400 ' + os.path.join(inDIR, qlImage)
+            convertCommand = 'convert "' + os.path.join(inDIR, image) + '" -resize 600 400 ' + os.path.join(inDIR, qlImage)
             os.system(convertCommand)
             
             # Get coordinated from photo   
@@ -94,7 +95,7 @@ class CreateJPEGKMZ(object):
             outKML.close()
             
             # Create KML archive
-            zipCommand = 'zip -r ' + imageBaseName + '.kmz ' + qlImage + ' ' + outKMLName
+            zipCommand = 'zip -r "' + imageBaseName + '.kmz" ' + qlImage + ' ' + outKMLName
             os.system(zipCommand)
             os.remove(qlImage)
             os.remove(outKMLName)
@@ -111,7 +112,7 @@ class CreateJPEGKMZ(object):
         outXY.close()
     
     def help(self):
-        print 'python CreateJPEGKMZ.py inDIR'
+        print 'python CreateJPEGKMZ.py inDIR outCSVFile.csv'
 
 if __name__ == '__main__':
     obj = CreateJPEGKMZ()
