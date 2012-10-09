@@ -15,6 +15,9 @@
 #
 # Dan Clewley (daniel.clewley@gmail.com)
 # 09/10/2012
+#
+# Function to link tables adapted from FORTRAN code
+# provide by Jane Whitcomb
 #######################################
 
 
@@ -156,7 +159,7 @@ outXMLFile = open(outRasterImageScript, 'w')
 outXMLFile.write(outRSGISText)
 outXMLFile.close()
 
-print 'Finished. 
+print 'Finished.'
 print 'If you have viewer installed, you can view the data using:'
 print ' viewer ' + outKEAFile
 print 'To create a standard raster, with a seperate band for each layer, run:'
