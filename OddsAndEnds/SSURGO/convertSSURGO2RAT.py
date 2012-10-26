@@ -61,7 +61,7 @@ outRasterImageScript = outRasterImageScript.replace('.env','.xml')
 if os.path.exists(outKEAFile) == False: 
     # Rasterize polygon using gdal
     print 'Creating raster'
-    rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr 30 30 -a MUKEY ' + inSHPFile + ' ' + outKEAFile + ' > /dev/null'
+    rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr ' + outRes + ' ' + outRes + ' -a MUKEY ' + inSHPFile + ' ' + outKEAFile + ' > /dev/null'
     os.system(rasterizeCommand)
     
     print 'Converting to RAT'
