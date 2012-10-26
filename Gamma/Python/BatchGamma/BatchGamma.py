@@ -2,7 +2,7 @@
 
 #########################################################################################
 #########################################################################################
-## BatchGammaFBD.py
+## BatchGamma.py
 ##
 ## A python script to process
 ## ALOS data using GAMMA
@@ -10,7 +10,7 @@
 ## GAMMA commands and creates new file
 ## to process individual scene
 ## Author: Dan Clewley 
-## Email: ddc06@aber.ac.uk
+## Email: daniel.clewley@gmail.com
 ## Date 15/02/2010
 ##
 ## Input parameters
@@ -18,7 +18,7 @@
 ## 2) inSceneList: text file containing scenes to be processed, type '-' to process all scenes in inDIR
 ## 3) processDIR: directory to process files
 ## 4) outDIRL: directory to copy files back to, type '-' to skip copying back
-## 5) zone + north or south e.g. 55n (enter LatLong or ll for lat long)
+## 5) Parameter file
 ## 
 ## In the template file the following names must be used:
 ## - Leader file - LEDFILENAME
@@ -40,23 +40,29 @@
 ## - Added option to subset pan on scene basis (as with SRTM)
 ## - Option to supply paths as parameter file
 ##
+## UPDATE - 26/10/2012 (Dan Clewley)
+## - Parameters now supplied via a text file
+## - Same script used for FBS / FBD / PLR 
+##
 #########################################################################################
 #########################################################################################
 
-import os, sys, string, re
+import os, sys, string, re, glob
 from time import gmtime, strftime
 
 print '''Script to process FBD ALOS scenes
-python BatchGammaFBD.py <inDIR> <inSceneList> <processDIR> <outDIR> <zone>
+python BatchGammaFBD.py <inDIR> <inSceneList> <processDIR> <outDIR> <parameter file>
  Input parameters:
  1) inDIR: directory containing raw, gzipped, data
  2) inSceneList: text file containing scenes to be processed, type '-' to process all scenes in inDIR
  3) processDIR: directory to process files
  4) outDIR: directory to copy files back to, type '-' to skip copying back
- 5) zone + north or south e.g. 55n (enter LatLong or LL for lat long)'''
+ 5) Parameter file'''
 
 #########################################################################################
-# SET FILE PATHS BASED ON ZONE
+
+# Set ALOS file Prefix
+alosFilePrefix = 'alps'
 
 # Check for the correct number of parameters
 numArgs = len(sys.argv)
@@ -64,8 +70,9 @@ if numArgs != 6:
     print "Not enough parameters supplied!"
     exit()
 
-zone = sys.argv[5].strip()
+parameterFileName = sys.argv[5]
 
+zone = 'utm'
 srtm = ''
 pan = ''
 subsetDEM = True
@@ -86,77 +93,76 @@ sys.path.append(scriptsPath + 'Python/BatchGamma/')
 topoCorrectionTemplate = scriptsPath + 'CSHTemplates/General/FBD_topo_correction_template.csh'
 postProcessDEMTemplate = scriptsPath + 'CSHTemplates/General/post_process_dem_template.csh'
 postProcessPANTemplate = scriptsPath + 'CSHTemplates/General/post_process_pan_template.csh'
-generateHalphaTemplate = scriptsPath + 'CSHTemplates/PolSARPro/generate_Halpha_FBD.csh'
-geoHalphaTemplate = scriptsPath + 'CSHTemplates/PolSARPro/geocode_Halpha.csh'
+generateHalphaTemplateFBD = scriptsPath + 'CSHTemplates/PolSARPro/generate_Halpha_FBD.csh'
+geoHalphaTemplateFBD = scriptsPath + 'CSHTemplates/PolSARPro/geocode_Halpha.csh'
+generateHalphaTemplatePLR = scriptsPath + 'CSHTemplates/PolSARPro/generate_Halpha.csh'
+geoHalphaTemplatePLR = scriptsPath + 'CSHTemplates/PolSARPro/geocode_HAalpha.csh'
+llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
 
-if zone == '54N' or zone == '54S' or zone == '54':
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_raw_to_SLC_Australia_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_SLC_to_GEO_Australia_template.csh'
-    srtm = '/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif'
-    pan = '/data/Australia/Basedata/LandsatPan/l7tmpa_aus_y2002_db9a2.tif'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z54.wkt'
+generateHalphaTemplate = generateHalphaTemplateFBD
+geoHalphaTemplate = geoHalphaTemplateFBD
 
-elif zone == '55N' or zone == '55S' or zone == '55':
-    srtm = '/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif'
-    pan = '/data/Australia/Basedata/LandsatPan/l7tmpa_aus_y2002_db9a2.tif'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z55.wkt'
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_raw_to_SLC_Australia_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_SLC_to_GEO_Australia_template.csh'
+#######################################################################################################
+# Get parameters from parameter file
 
-elif zone =='56' or zone == '56N' or zone == '56S':
-    srtm = '/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif'
-    pan = '/data/Australia/Basedata/LandsatPan/l7tmpa_aus_y2002_db9a2.tif'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z56.wkt'
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_raw_to_SLC_Australia_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/Australia/FBD_SLC_to_GEO_Australia_template.csh'
+rawSLCTemplateSet = False
+slcGeoTemplateSet = False
+srtmSet = False
+panSet = False
 
-elif zone =='46N' or zone == '46n':
-    srtm = '/data/temp/SonaliALOS/DEM/astdem_mosaic.env'
-    pan = '/data/temp/SonaliALOS/PAN/L4TM_1989_B1_mos.env'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z46n.wkt'
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/General/FBD_raw_to_SLC_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/General/FBD_SLC_to_GEO_withPAN_template.csh'
-    res = 90
+parameterFile = open(parameterFileName,'rU')
+for line in parameterFile:
+    if line.count(':') >= 1:
+        elements = line.split(':',line.count(':'))
+        if elements[0].strip() == 'rawSLCTemplate':
+            rawSLCTemplate = elements[1].strip()
+            rawSLCTemplateSet = True
+        elif elements[0].strip() == 'slcGeoTemplate':
+            slcGeoTemplate = elements[1].strip()
+            slcGeoTemplateSet = True
+        elif elements[0].strip() == 'dem':
+            srtm = elements[1].strip()
+            srtmSet = True
+        elif elements[0].strip() == 'pan':
+            pan = elements[1].strip()
+            panSet = True
+        elif elements[0].strip() == 'outProj':
+            utmProjFile = elements[1].strip() 
+        elif elements[0].strip() == 'demRes':
+            demRes = elements[1].strip() 
+        elif elements[0].strip() == 'subsetDEM':
+            if elements[1].strip() == 'True':
+                subsetDEM = True
+            else:
+                subsetDEM = False
+        elif elements[0].strip() == 'subsetPan':
+            if elements[1].strip() == 'True':
+                subsetPan = True
+            else:
+                subsetPan = False
+        elif elements[0].strip() == 'genAlphaEntropy':
+            if elements[1].strip() == 'True':
+                genAlphaEntropy = True
+            else:
+                genAlphaEntropy = False
+        elif elements[0].strip() == 'topoCorrect':
+            if elements[1].strip() == 'True':
+                topoCorrect = True
+            else:
+                topoCorrect = False
 
-elif zone =='Belize':
-    srtm = '/data/ALOS/Belize/SRTM/SRTM_Belize_DEM.ieee'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z56.wkt'
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/SouthAmerica/FBD_raw_to_SLC_belize_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/SouthAmerica/FBD_SLC_to_GEO_belize_template.csh'
-    zone='LatLong'
-    res = 90
-    
-elif zone =='UK':
-    srtm = '/data/Wales/Basedata/Elevation/Wales_fltg_grtr0'
-    llProjFile = scriptsPath + 'Projection/LL_WGS84.wkt'
-    utmProjFile = scriptsPath + 'Projection/utm_z30n.wkt'
-    rawSLCTemplate = scriptsPath + 'CSHTemplates/UK/FBD_raw_to_SLC_UK_template.csh'
-    slcGeoTemplate = scriptsPath + 'CSHTemplates/UK/FBD_SLC_to_GEO_UK_template.csh'
-    subsetPAN = False
-    zone='BNG'
-    res = 5
-                
-else:
-    print 'Zone is not 54, 55, or 56.\nAssuming Lat-Long.\nSetting all paths relative to this script\n'  
-    sys.path.append('../GenerateHeader/')
-    sys.path.append('../QuickLook/')
-    sys.path.append('../SubsetDEM/')
-    sys.path.append('../GeneratePAR/')
-    srtm = raw_input('Please enter the location of the elevation data:\n')
-    rawSLCTemplate = raw_input('Please enter CSHTemplate to create SLC image:\n')
-    slcGeoTemplate = raw_input('Please enter CSHTemplate to geocode SLC image:\n')
-    topoCorrectQuestion = raw_input('Would you like the data to be topographically corrected? (enter y or n):\n')
-    if topoCorrectQuestion == 'y':
-        topoCorrectionTemplate = raw_input('Please enter CSHTemplate for topographic correction:\n')
-    else:
-        topoCorrect = False
-    subsetDEM = False
-    genAlphaEntropy = False
+if rawSLCTemplateSet == False:
+    print "ERROR: No SLC template set. Set using 'rawSLCTemplate' in parameter file"
+    exit() 
+if slcGeoTemplateSet == False:
+    print "ERROR: No georefferencing template set. Set using 'slcGeoTemplate' in parameter file"
+    exit()
+if srtmSet == False:
+    print "ERROR: No DEM provided. Set using 'dem' in parameter file"
+    exit()
+if panSet == False:
+    print "WARNING: No panchromatic mosic provided. If required for georefferencing Set using 'pan' in parameter file"
+    exit()
 
 #######################################################################################################
     
@@ -179,13 +185,12 @@ processScenes = list()
 if inSceneListFile == '-': # If no process list provided process all scenes in DIR
     fileList = os.listdir(inDIR)
     for fileName in fileList:
-       if fileName[0:4] == 'alps':
+       if fileName[0:4] == alosFilePrefix:
            processScenes.append(re.sub('.tar.gz','',fileName))
 
-else: #When using a list of files, checks for default name begining with alps, need to change this line if using non-AU names.
+else: 
     inSceneList = open(inSceneListFile, 'r')
     for line in inSceneList:
-        #if line[0:4] == 'alps':
         processScenes.append(line.strip())
 
 for scene in processScenes:
@@ -236,13 +241,15 @@ for scene in processScenes:
         os.system(mvCMD2)
         os.system(mvCMD3) 
                 
-    print 'Data DIR = ' + dataDIR
+    print ' Data DIR = ' + dataDIR
     os.chdir(dataDIR)
     
     # Create temp output files
     temp1 = 'temp1.csh'
     temp2 = 'temp2.csh'
     temp3 = 'temp3.csh'
+    temp4 = 'temp4.csh'
+    temp5 = 'temp5.csh'
     rawSLCScript = 'raw_to_SLC.csh'
     slcGeoScript = 'SLC_to_GEO.csh'
     postProcessDEMScript = 'PostProcessDEM.csh'
@@ -253,36 +260,62 @@ for scene in processScenes:
     
     print '----------------------------------'
     print '2) Creating GAMMA scripts...'
-    # Replace Leader file Name
-    findLEDCMD = 'ls LED*'
-    out = os.popen(findLEDCMD)
-    LEDFile = re.sub('\n','',str(out.readline()))
-    out.close()
-    replaceLEDCMD = 'sed \'s/LEDFILENAME/' + LEDFile + '/g\' ' + rawSLCTemplate + ' > ' + temp1
-    os.system(replaceLEDCMD)
-    
+    # Check processing level of data
+    LEDFileList = glob.glob('LED*')
+    if len(LEDFileList) > 0:
+        LEDFile = LEDFileList[0]
+        replaceLEDCMD = 'sed \'s/LEDFILENAME/' + LEDFile + '/g\' ' + rawSLCTemplate + ' > ' + temp1
+        os.system(replaceLEDCMD)
+    else:
+        raise Exception('Leader file not found!')
+
     # Replace IMG-HH file Name
-    findHHCMD = 'ls IMG-HH*'
-    out = os.popen(findHHCMD)
-    HHFile = re.sub('\n','',str(out.readline()))
-    out.close()
-    replaceHHCMD = 'sed \'s/HHFILENAME/' + HHFile + '/g\' ' + temp1 + ' > ' + temp2
-    os.system(replaceHHCMD)
-    
+    HHFileList = glob.glob('IMG-HH*')
+    if len(HHFileList) > 0:
+        HHFile = HHFileList[0]
+        replaceHHCMD = 'sed \'s/HHFILENAME/' + HHFile + '/g\' ' + temp1 + ' > ' + temp2
+    else:
+        replaceHHCMD = 'cp ' + temp1 + ' ' + temp2
+    os.system(replaceHHCMD)    
+
     # Replace IMG-HV file Name
-    findHVCMD = 'ls IMG-HV*'
-    out = os.popen(findHVCMD)
-    HVFile = re.sub('\n','',str(out.readline()))
-    out.close()
-    replaceHVCMD = 'sed \'s/HVFILENAME/' + HVFile + '/g\' ' + temp2 + ' > ' + temp3
+    HVFileList = glob.glob('IMG-HV*')
+    if len(HVFileList) > 0:
+        HVFile = HVFileList[0]
+        replaceHVCMD = 'sed \'s/HVFILENAME/' + HVFile + '/g\' ' + temp2 + ' > ' + temp3
+    else:
+        replaceHVCMD = 'cp ' + temp2 + ' ' + temp3
     os.system(replaceHVCMD)
     
+    # Replace IMG-VV file Name
+    VVFileList = glob.glob('IMG-VV*')
+    if len(VVFileList) > 0:
+        VVFile = VVFileList[0]
+        replaceVVCMD = 'sed \'s/VVFILENAME/' + VVFile + '/g\' ' + temp3 + ' > ' + temp4
+        # Set alpha / entropy templates for polarimetric data instead of FBD
+        generateHalphaTemplate = generateHalphaTemplatePLR
+        geoHalphaTemplate = geoHalphaTemplatePLR
+        
+    else:
+        replaceVVCMD = 'cp ' + temp3 + ' ' + temp4
+    os.system(replaceVVCMD)
+    
+    # Replace IMG-VH file Name
+    VHFileList = glob.glob('IMG-VH*')
+    if len(VHFileList) > 0:
+        VHFile = VHFileList[0]
+        replaceVHCMD = 'sed \'s/VVFILENAME/' + VHFile + '/g\' ' + temp4 + ' > ' + temp5
+    else:
+        replaceVHCMD = 'cp ' + temp4 + ' ' + temp5
+    os.system(replaceVHCMD)
+    
+
+    
     # Replace Scenename
-    replaceSceneNameSLCCMD = 'sed \'s/SCENENAME/' + scene + '/g\' ' + temp3 + ' > ' + rawSLCScript
+    replaceSceneNameSLCCMD = 'sed \'s/SCENENAME/' + scene + '/g\' ' + temp5 + ' > ' + rawSLCScript
     replaceSceneNameGEOCMD = 'sed \'s/SCENENAME/' + scene + '/g\' ' + slcGeoTemplate + ' > ' + slcGeoScript
     os.system(replaceSceneNameSLCCMD)
     os.system(replaceSceneNameGEOCMD)
-    
     if subsetDEM:
         replaceSceneNamePostProcessDEMCMD = 'sed \'s/SCENENAME/' + scene + '/g\' ' + postProcessDEMTemplate + ' > ' + postProcessDEMScript
         os.system(replaceSceneNamePostProcessDEMCMD)
