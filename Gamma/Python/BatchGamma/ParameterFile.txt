@@ -8,3 +8,5 @@ subsetDEM:True
 subsetPan:True
 genAlphaEntropy:False
 topoCorrect:True
+metaContactName:Dan Clewley / Richard Lucas
+metaContactEmail:ddc06@aber.ac.uk / rml@aber.ac.uk
