@@ -1,5 +1,5 @@
 rawSLCTemplate:/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/General/FBD_raw_to_SLC_template.csh
-slcGeoTemplate:/data/home/ddc06/Documents/Development/Gamma/Users/danclewley/Documents/Research/Development/RSGISScripts/Gamma/CSHTemplates/General/FBD_SLC_to_GEO_withPAN_template.csh
+slcGeoTemplate:/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/General/FBD_SLC_to_GEO_withPAN_template.csh
 dem:/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif
 pan:/data/Australia/Basedata/LandsatPan/NILband8.ers
 outProj:/data/home/ddc06/Documents/Development/Gamma/Projection/utm_z55.wkt
