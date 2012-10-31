@@ -104,7 +104,8 @@ geoHalphaTemplate = geoHalphaTemplateFBD
 
 #######################################################################################################
 # Get parameters from parameter file
-
+metaContactName = "Aberystywth University"
+metaContactEmail = "ddc06@aber.ac.uk"
 rawSLCTemplateSet = False
 slcGeoTemplateSet = False
 srtmSet = False
@@ -150,6 +151,10 @@ for line in parameterFile:
                 topoCorrect = True
             else:
                 topoCorrect = False
+        elif elements[0].strip() == 'metaContactName':
+            metaContactName = elements[1].strip()
+        elif elements[0].strip() == 'metaContactEmail':
+            metaContactEmail = elements[1].strip()
 
 if rawSLCTemplateSet == False:
     print "ERROR: No SLC template set. Set using 'rawSLCTemplate' in parameter file"
@@ -462,7 +467,7 @@ for scene in processScenes:
         os.system(cmdrenamedir)
         
         # Create metadata file
-        meta = BatchGammaMeta(newSceneDIR, "FBD")
+        meta = BatchGammaMeta(newSceneDIR, metaContactName, metaContactEmail)
         meta.writeMetaText()
         
         # Copy back
