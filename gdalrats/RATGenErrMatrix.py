@@ -26,7 +26,8 @@ class GenErrorMatrixFromRAT (object):
             outputFile.write('\\begin{document}\n')
             # Create the latex table
             outputFile.write('\\begin{table}[htdp]\n')
-            outputFile.write('\\caption{Error Matrix}\n')
+            caption = str("\\caption{Error Matrix. Av. User Error: ") + str(round(np.mean(userVals),2)) + str("\% Av. Prod Error: ") + str(round(np.mean(prodVals))) + str("\%}\n")
+            outputFile.write(caption)
             outputFile.write('\\begin{center}\n')
             tabularLine = '\\begin{tabular}{|c|'
             for classVal in classes:
