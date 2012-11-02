@@ -8,7 +8,7 @@ import optparse
 
 class GenErrorMatrixFromRAT (object):
 
-    def exportToTex(self, outputFilePath, errMatrix, classes, userVals, prodVals, overallErr):
+    def exportToTex(self, outputFilePath, errMatrix, classes, userVals, prodVals, overallErr, kappa):
         try:
             # Open File
             outputFile = open(outputFilePath, 'w')
@@ -26,7 +26,7 @@ class GenErrorMatrixFromRAT (object):
             outputFile.write('\\begin{document}\n')
             # Create the latex table
             outputFile.write('\\begin{table}[htdp]\n')
-            caption = str("\\caption{Error Matrix. Av. User Error: ") + str(round(np.mean(userVals),2)) + str("\% Av. Prod Error: ") + str(round(np.mean(prodVals))) + str("\%}\n")
+            caption = str("\\caption{Error Matrix. Av. User Error: ") + str(round(np.mean(userVals),2)) + str("\% Av. Prod Error: ") + str(round(np.mean(prodVals))) + str("\% Kappa: ") + str(round((kappa*100),2)) +  str("\%}\n")
             outputFile.write(caption)
             outputFile.write('\\begin{center}\n')
             tabularLine = '\\begin{tabular}{|c|'
@@ -122,12 +122,38 @@ class GenErrorMatrixFromRAT (object):
     
     def calcOverallErr(self, errMatrix, classes):
         sumDataPts = np.sum(errMatrix)
+        if sumDataPts == 0:
+            return 0.0
         sumCorrect = 0
         for i in range(len(classes)):
             sumCorrect = sumCorrect + errMatrix[i][i]
+            
+        return (float(sumCorrect)/float(sumDataPts))*100
+        
+    def calcKappa(self, errMatrix, classes):
+        sumDataPts = np.sum(errMatrix)
         if sumDataPts == 0:
             return 0.0
-        return (float(sumCorrect)/float(sumDataPts))*100
+                
+        prodErr = list()
+        userErr = list()
+        sumCorrect = 0
+        for i in range(len(classes)):
+            userErr.append(np.sum(errMatrix[i]))
+            totProdErr = 0
+            for j in range(len(classes)):
+                totProdErr += errMatrix[j][i]
+            prodErr.append(totProdErr)
+            sumCorrect += errMatrix[i][i]
+        
+        sumUserProd = 0
+        for i in range(len(classes)):
+            sumUserProd += (prodErr[i] * userErr[i])
+        
+        sumDataPtsSqd = sumDataPts * sumDataPts
+        
+        return ((float(sumDataPts) * float(sumCorrect)) - float(sumUserProd))/(float(sumDataPtsSqd) - float(sumUserProd))
+        
 
     def run(self, cmdargs):
         # Get variables from command line
@@ -165,6 +191,7 @@ class GenErrorMatrixFromRAT (object):
         userErr = list()
         prodErr = list()
         overallErr = 0
+        kappa = 0
         for i in range(numClasses):
             row = list()
             for j in range(numClasses):
@@ -185,9 +212,12 @@ class GenErrorMatrixFromRAT (object):
         # Calculate the overall error
         overallErr = self.calcOverallErr(errMatrix, classes)
         
+        # Calculate kappa
+        kappa = self.calcKappa(errMatrix, classes)
+        
         # Write the error matrix to the output file.
         if outFileType == 'tex':
-            self.exportToTex(outputFilePath, errMatrix, classes, userErr, prodErr, overallErr)
+            self.exportToTex(outputFilePath, errMatrix, classes, userErr, prodErr, overallErr, kappa)
         else:
             print "Currently, the only available output type is \'tex\'."
             sys.exit()
