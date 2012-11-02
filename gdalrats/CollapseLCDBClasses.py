@@ -107,7 +107,7 @@ def collapseClasses(inputFile, lcdbColName, outputColName):
     outClassesCol = np.where(lcdbCol==64,BARE_GROUND,outClassesCol)
     # Deciduous Hardwoods -> OTHER_WOODY
     outClassesCol = np.where(lcdbCol==68,OTHER_WOODY,outClassesCol)
-    # Indigenous Forest ->
+    # Indigenous Forest -> INDIGENOUS_FOREST
     outClassesCol = np.where(lcdbCol==69,INDIGENOUS_FOREST,outClassesCol)
     # Mangroves -> OTHER_WOODY
     outClassesCol = np.where(lcdbCol==70,OTHER_WOODY,outClassesCol)
