@@ -14,32 +14,30 @@ def collapseClasses(inputFile, lcdbColName, outputColName):
     
     # 0 Undefined
     UNDEFINED = 0
-    # 1 High Producing Exotic Grasslands
-    HIGH_PRODUCING_EXOTIC_GRASSLANDS = 1
-    # 2 Crops
-    CROPS = 2
-    # 3 Tall Tussock Grassland
-    TALL_TUSSOCK_GRASSLAND = 3
-    # 4 Other Herbaceous
-    OTHER_HERBACEOUS = 4
-    # 5 Scrub
-    SCRUB = 5
-    # 6 Indigenous Forest
-    INDIGENOUS_FOREST = 6
-    # 7 Exotic Forest
-    EXOTIC_FOREST = 7
-    # 8 Other Woody
-    OTHER_WOODY = 8
-    # 9 Sub Alpine Scrubland
-    SUB_ALPINE_SCRUBLAND = 9
-    # 10 Built Up
-    BUILT_UP = 10
-    # 11 Bare Ground
-    BARE_GROUND = 11
-    # 12 Water
-    WATER = 12
-    # 13 Perminant Snow and Ice
-    PERMINANT_SNOW_ICE = 13
+    # 1 High Producing Exotic Herbaceous
+    HIGH_PRODUCING_EXOTIC_HERBACEOUS = 1
+    # 2 Tall Tussock Grassland
+    TALL_TUSSOCK_GRASSLAND = 2
+    # 3 Other Herbaceous
+    OTHER_HERBACEOUS = 3
+    # 4 Scrub
+    SCRUB = 4
+    # 5 Indigenous Forest
+    INDIGENOUS_FOREST = 5
+    # 6 Exotic Forest
+    EXOTIC_FOREST = 6
+    # 7 Other Woody
+    OTHER_WOODY = 7
+    # 8 Sub Alpine Scrubland
+    SUB_ALPINE_SCRUBLAND = 8
+    # 9 Built Up
+    BUILT_UP = 9
+    # 10 Bare Ground
+    BARE_GROUND = 10
+    # 11 Water
+    WATER = 11
+    # 12 Perminant Snow and Ice
+    PERMINANT_SNOW_ICE = 12
 
     # Undefined -> UNDEFINED
     outClassesCol = np.where(lcdbCol==0,UNDEFINED,outClassesCol)
@@ -69,14 +67,14 @@ def collapseClasses(inputFile, lcdbColName, outputColName):
     outClassesCol = np.where(lcdbCol==21,WATER,outClassesCol)
     # Estuarine Open Water -> WATER
     outClassesCol = np.where(lcdbCol==22,WATER,outClassesCol)
-    # Short-rotation Cropland -> CROPS
-    outClassesCol = np.where(lcdbCol==30,CROPS,outClassesCol)
+    # Short-rotation Cropland -> HIGH_PRODUCING_EXOTIC_HERBACEOUS
+    outClassesCol = np.where(lcdbCol==30,HIGH_PRODUCING_EXOTIC_HERBACEOUS,outClassesCol)
     # Cultivation -> BARE_GROUND
     outClassesCol = np.where(lcdbCol==31,BARE_GROUND,outClassesCol)
-    # Orchard Vineyard & Other Perennial Crops -> CROPS
-    outClassesCol = np.where(lcdbCol==33,CROPS,outClassesCol)
-    # High Producing Exotic Grassland -> HIGH_PRODUCING_EXOTIC_GRASSLANDS
-    outClassesCol = np.where(lcdbCol==40,HIGH_PRODUCING_EXOTIC_GRASSLANDS,outClassesCol)
+    # Orchard Vineyard & Other Perennial Crops -> HIGH_PRODUCING_EXOTIC_HERBACEOUS
+    outClassesCol = np.where(lcdbCol==33,HIGH_PRODUCING_EXOTIC_HERBACEOUS,outClassesCol)
+    # High Producing Exotic Grassland -> HIGH_PRODUCING_EXOTIC_HERBACEOUS
+    outClassesCol = np.where(lcdbCol==40,HIGH_PRODUCING_EXOTIC_HERBACEOUS,outClassesCol)
     # Low Producing Grassland -> OTHER_HERBACEOUS
     outClassesCol = np.where(lcdbCol==41,OTHER_HERBACEOUS,outClassesCol)
     # Tall Tussock Grassland -> TALL_TUSSOCK_GRASSLAND
