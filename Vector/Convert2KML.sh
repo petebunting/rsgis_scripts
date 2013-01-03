@@ -1,0 +1,6 @@
+
+# print the wkt projections string for an image file...
+spdproj --image <imafe file>
+
+# You can remove the -s_srs option if the shapefile has the projection correctly defined...
+ogr2ogr -f KML -s_srs <path to a wkt file with the source projections> -t_srs latlong_WGS84.wkt  StudySite_kml.kml StudySite.shp
