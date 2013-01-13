@@ -83,6 +83,44 @@ class GenErrorMatrixFromMapAccuracy (object):
         except IOError, e:
             print '\nCould not open file:\n', e
             return
+            
+    def exportToCSV(self, outputFilePath, errMatrix, classes, userVals, prodVals, overallErr, kappa):
+        try:
+            # Open File
+            outputFile = open(outputFilePath, 'w')
+            
+            # Create table column titles
+            titleLine = ''
+            for classVal in classes:
+                titleLine =  titleLine + str(",") + str(classVal)
+            titleLine =  titleLine + ',Users\n'
+            outputFile.write(titleLine)
+            
+            # Create main table body
+            yIdx = 0
+            for classValY in classes:
+                line = str(classValY) + ','
+                xIdx = 0
+                for classValX in classes:
+                    line = line + str(errMatrix[yIdx][xIdx]) + ","
+                    xIdx = xIdx + 1
+                line = line + str(round(userVals[yIdx],2)) + '\n'
+                outputFile.write(line)
+                yIdx = yIdx + 1
+            
+            # Add bottom (producers) row
+            line = 'Prod'
+            for val in prodVals:
+                line = line + ',' + str(round(val,2))
+            line = line + ',' + str(round(overallErr,2)) + '\n'
+            outputFile.write(line)
+            
+            # Close and flush output file
+            outputFile.flush()
+            outputFile.close()
+        except IOError, e:
+            print '\nCould not open file:\n', e
+            return
     
     def findColIdx(self, classes, val):
         i = 0
@@ -162,19 +200,14 @@ class GenErrorMatrixFromMapAccuracy (object):
             #print line
             tokens = line.split('\t')
             #print tokens
-            predCol.append(tokens[3].strip())
-            knownCol.append(tokens[4].strip())
+            predCol.append(tokens[4].strip())
+            knownCol.append(tokens[5].strip())
     
     def run(self, cmdargs):
         # Get variables from command line
         inputFilePath = cmdargs.inputFile.strip()
         outputFilePath = cmdargs.outputFile.strip()
         outFileType = cmdargs.outType.strip()
-
-        # Check output type is supported.
-        if outFileType != 'tex':
-            print "Currently, the only available output type is \'tex\'."
-            sys.exit()
         
         predCol = list()
         knownCol = list()
@@ -229,8 +262,10 @@ class GenErrorMatrixFromMapAccuracy (object):
         # Write the error matrix to the output file.
         if outFileType == 'tex':
             self.exportToTex(outputFilePath, errMatrix, classes, userErr, prodErr, overallErr, kappa)
+        elif outFileType == 'csv':
+            self.exportToCSV(outputFilePath, errMatrix, classes, userErr, prodErr, overallErr, kappa)
         else:
-            print "Currently, the only available output type is \'tex\'."
+            print "Currently, the only available output type is \'tex\' or \'csv\'."
             sys.exit()
         
 
