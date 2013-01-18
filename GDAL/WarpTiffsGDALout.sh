@@ -17,7 +17,7 @@ for f in $FILES
 do
   echo "Processing $f file..."
   filename=`basename ${f} .tif`
-  echo "Output: ${2}/${filename}_warp.tif"
-  gdalwarp -overwrite -r cubic -multi -wt Float32 -of GTIFF -co "TILED=YES COMPRESS=DEFLATE ZLEVEL=1" ${f} ${2}/${filename}_warp.tif
-  gdalcalcstats ${2}/${filename}_warp.tif -ignore 0
+  echo "Output: ${2}/${filename}_warp.$4"
+  gdalwarp -overwrite -r cubic -multi -wt Float32 -of ${3} ${f} ${2}/${filename}_warp.$4
+  gdalcalcstats ${2}/${filename}_warp.$4 -ignore 0
 done

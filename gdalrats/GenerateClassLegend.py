@@ -104,7 +104,7 @@ class GenerateRATClassLegend (object):
             imBorder = 5
             recWidth = 100
             recHeight = 50
-            numPxlsPerChar = 18
+            numPxlsPerChar = 21
             imColWidth = ((maxNumChars * numPxlsPerChar) + recWidth) + imBorder
             imRowHeight = recHeight + imBorder
             imXSize = (numCols * imColWidth) + (imBorder*2)
