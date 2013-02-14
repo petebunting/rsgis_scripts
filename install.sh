@@ -1,4 +1,4 @@
-mkdir $1/bin
+mkdir -p $1/bin
 cp ./General/BatchCommand/BatchCommand.py $1/bin/
 cp ./General/BatchCommand/BatchCommandPP.py $1/bin/
 cp ./Vector/OGR2OGR/CreateCSVfromSHP.py $1/bin/
