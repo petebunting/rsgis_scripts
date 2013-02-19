@@ -17,6 +17,20 @@ import sys
 
 class MergeSHPfiles (object):
 
+    def getOGRTypeFromExt(self, fileName):
+        # A function to get the ORG format string
+        # based on a file extension
+        extension = os.path.splitext(fileName)[-1] 
+
+        if extension == '.shp':
+            return "ESRI Shapefile"
+        elif extension == '.kml':
+            return "KML"
+        elif extension == '.sqlite':
+            return "SQLite"
+        else:
+            raise Exception('Type not recognised')
+
     # A function to remove a .shp extension from a file name
     def removeSHPExtension(self, name):
         # The output file name
@@ -88,18 +102,22 @@ class MergeSHPfiles (object):
        self.findFilesExt(filePath, '.shp', fileList)
        # Variable used to identify the first file
        first = True
+       # Format string for outFile
+       formatStr = ' -f "' + self.getOGRTypeFromExt(newSHPfile) + '" '
+
        # A string for the command to be built
        command = ''
        # Iterate through the files.
        for file in fileList:
            print "Adding:" + file 
-           if first:
+           if first and formatStr.find('SQLite') < -1:
                # If the first file make a copy to create the output file
-               command = 'ogr2ogr ' + newSHPfile + ' "' + file + '"'
+               # Don't need to create copy for SQLite
+               command = 'ogr2ogr ' + formatStr + newSHPfile + ' "' + file + '"'
                first = False
            else:
                # Otherwise append the current shapefile to the output file
-               command = 'ogr2ogr -update -append ' + newSHPfile + ' "'  + \
+               command = 'ogr2ogr -update -append ' + formatStr + newSHPfile + ' "'  + \
                file + '" -nln ' + \
                self.removeSHPExtension(self.removeFilePath(newSHPfile))
            # Execute the current command
