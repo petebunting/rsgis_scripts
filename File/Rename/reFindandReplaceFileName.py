@@ -35,7 +35,8 @@ fileList = os.listdir(inDIR)
 
 for fileName in fileList:        
     newFileName = re.sub(findString, replaceString, fileName)
-    
-    mvcmd = 'mv ' + inDIR + '/' + fileName + ' ' + inDIR + '/' + newFileName
-    os.system(mvcmd)
+
+    if fileName != newFileName:
+        mvcmd = 'mv ' + inDIR + '/' + fileName + ' ' + inDIR + '/' + newFileName
+        os.system(mvcmd)
     
