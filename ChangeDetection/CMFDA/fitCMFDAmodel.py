@@ -13,7 +13,12 @@
 import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
-
+useRLM = True
+try:
+    import statsmodels.api as sm
+except ImportError:
+    useRLM = False
+    
 # Set T (number of days in a year)
 T = 365
 # Calculate 2 pi / T
@@ -97,7 +102,14 @@ modelTerms.append(bnTerm)
 # Solve A x = b to give x
 b = ndvi
 A = np.array(modelTerms).T
-x = np.linalg.lstsq(A, b)[0]
+
+if useRLM == True:
+    print "Robust fitting"
+    rlmmodel = sm.RLM(b, A, M=sm.robust.norms.HuberT())
+    rlmResults = rlmmodel.fit()
+    x = rlmResults.params
+else:
+    x = np.linalg.lstsq(A, b)[0]
 
 print "Coefficients: "
 print x
