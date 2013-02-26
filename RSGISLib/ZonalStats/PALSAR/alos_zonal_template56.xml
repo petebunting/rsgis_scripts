@@ -1,0 +1,41 @@
+    <!-- Stack ALOS bands -->
+    <!-- HHSigma0, HVSigma0, HHGamma0, HVGamma0, HHTopo, HVTopo, Incidence Angle-->
+    <rsgis:command algor="stackbands" option="imgs" output="$/?/?_temp_stack">
+        <rsgis:image file="$/?/?.hh.utm"/>
+        <rsgis:image file="$/?/?.hh.utm"/>
+        <rsgis:image file="$/?/?.gamma.hh.utm"/>
+        <rsgis:image file="$/?/?.gamma.hv.utm"/>
+        <rsgis:image file="$/?/?.topo.hh.utm"/>
+        <rsgis:image file="$/?/?.topo.hv.utm"/>
+        <rsgis:image file="$/?/?.inc"/>
+    </rsgis:command>
+    
+    <!-- CREATE RASTER VERSION OF VECTOR -->
+    <rsgis:command algor="vectorutils" option="rasterise" vector="/Users/danclewley/Documents/Temp/ALOSBGLExtraction/Polygons_UTM56/?_utm.shp" output="/Users/danclewley/Documents/Temp/ALOSBGLExtraction/Polygons_UTM56/?_raster.env" resolution="12.5" attribute="FID" method="adaptive" constval="0"/>
+    <!-- RUN ZONAL STATS -->
+    <rsgis:command algor="zonalstats" option="pixelmean" image="$/?/?_temp_stack" raster="/Users/danclewley/Documents/Temp/ALOSBGLExtraction/Polygons_UTM56/?_raster.env" vector="/Users/danclewley/Documents/Temp/ALOSBGLExtraction/Polygons_UTM56/?_utm.shp" output="$/?/?_biomassPlots.shp" force="yes" pxlcount="yes">
+        <rsgis:attribute name="HHSigma0" >
+            <rsgis:band band="1" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="HVSigma0" >
+            <rsgis:band band="2" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="HHGamma0" >
+            <rsgis:band band="3" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="HVGamma0" >
+            <rsgis:band band="4" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="HHTopo" >
+            <rsgis:band band="5" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="HVTopo" >
+            <rsgis:band band="6" threshold="-999" />
+        </rsgis:attribute>
+        <rsgis:attribute name="IncLoc" >
+            <rsgis:band band="7" threshold="-999" />
+        </rsgis:attribute>
+    </rsgis:command>
+    
+    <!-- Remove Temp Stacked File -->
+    <rsgis:command algor="commandline" option="execute" command="rm $/?/?_temp_stack*" />
