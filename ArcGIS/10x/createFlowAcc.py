@@ -14,9 +14,9 @@ import arcpy
 arcpy.CheckOutExtension("spatial")
 
 if len(sys.argv) != 4:
-	print '''Not enough parameters provided.
+    print '''Not enough parameters provided.
 Usage:
-	python createFlowAcc.py inDEM outDIR outBaseName
+    python createFlowAcc.py inDEM outDIR outBaseName
 '''
     exit()
 
@@ -25,10 +25,10 @@ outDIR = sys.argv[2]
 outFileBase = sys.argv[3]
 
 # Local variables:
-outFill = os.path.join(outDIR, outFileBase + '_fill.tif')
-outDirection = os.path.join(outDIR, outFileBase + '_flow_direction.tif')
+outFill = os.path.join(outDIR, outFileBase + '_fill.img')
+outDirection = os.path.join(outDIR, outFileBase + '_flow_direction.img')
 Output_drop_raster = ""
-outAccumulation =  os.path.join(outDIR, outFileBase + '_flow_accumulation.tif')
+outAccumulation =  os.path.join(outDIR, outFileBase + '_flow_accumulation.img')
 
 # Process: Fill
 print 'Filling gaps in DEM'
