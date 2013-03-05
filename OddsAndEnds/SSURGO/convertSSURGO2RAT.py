@@ -62,6 +62,7 @@ if os.path.exists(outKEAFile) == False:
     # Rasterize polygon using gdal
     print 'Creating raster'
     rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr ' + outRes + ' ' + outRes + ' -a MUKEY ' + inSHPFile + ' ' + outKEAFile + ' > /dev/null'
+    print rasterizeCommand
     os.system(rasterizeCommand)
     
     print 'Converting to RAT'
