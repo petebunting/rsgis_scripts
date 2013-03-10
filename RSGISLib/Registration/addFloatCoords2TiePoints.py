@@ -13,6 +13,13 @@ import osgeo.gdal as gdal
 import numpy as np
 import csv
 
+if len(sys.argv) != 4:
+    print '''Not enough parameters provided.
+Usage:
+    python addFloatCoords2TiePoints.py inImageFile inTiePointFile.csv outTiePointFile.csv
+'''
+    exit()
+
 inImageFile = sys.argv[1]
 inGCPFile = sys.argv[2]
 outGCPFile = sys.argv[3]
