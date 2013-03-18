@@ -11,7 +11,7 @@ def converttodB(info, inputs, outputs):
     Converts to dB using:
     10*log10(b1)
     """
-    outputs.outimage = 10 * np.log10(inputs.inimage)
+    outputs.outimage = np.where(inputs.inimage > 0,10 * np.log10(inputs.inimage),0)
 
 if len(sys.argv) == 3:
     inImage = sys.argv[1]
