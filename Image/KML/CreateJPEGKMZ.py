@@ -31,9 +31,12 @@ class CreateJPEGKMZ(object):
         for tag, value in info.items():
             decoded = TAGS.get(tag, tag)
             photoInfo[decoded] = value
-        
-        if photoInfo["GPSInfo"][2][0][1] == 0:
-            print "No GeoInfo for: " + inImageFile
+            
+        try:
+            if photoInfo["GPSInfo"][2][0][1] == 0:
+                print "No GeoInfo for: " + inImageFile
+        except KeyError:
+            print "No Geotags for : " + inImageFile
         else:
             # Create quicklook image (using imagemagick)
             qlImage = imageBaseName + '_ql.png'
