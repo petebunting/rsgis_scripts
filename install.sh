@@ -6,3 +6,4 @@ cp ./Text/FindReplaceTextDIR.py $1/bin/
 cp ./Text/JoinTablesCSV.py $1/bin/
 cp ./gdalrats/setthematic.py $1/bin/
 cp ./File/Rename/reFindandReplaceFileName.py $1/bin/
+cp ./GDAL/setbandname.py $1/bin
