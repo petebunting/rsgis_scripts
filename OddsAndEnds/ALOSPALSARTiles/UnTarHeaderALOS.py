@@ -29,7 +29,7 @@ class BatchRunCommand (object):
 
     def unTar(self, inDIR, fileName):
         if os.path.isdir(os.path.join(inDIR,fileName)):
-            print('Skipping ' + os.path.join(inDIR,fileName) + '.tar.gz')
+            print(' Skipping ' + os.path.join(inDIR,fileName) + '.tar.gz')
             return 0
         else:
             mkdirCommand = 'mkdir ' + inDIR + '/' + fileName
@@ -192,16 +192,19 @@ wavelength units = Unknown
             else:
                 baseFile = fileName
             if skipFile == False:
-                inHHFile, inHVFile = self.createHeader(inDIR + '/' + baseFile + '/')
-                inBaseFile =  inDIR + '/' + baseFile + '/' + re.sub('_HH','',inHHFile)
-                if createStack:
-                    self.createStack(inBaseFile)
+                try:
+                    inHHFile, inHVFile = self.createHeader(inDIR + '/' + baseFile + '/')
+                    inBaseFile =  inDIR + '/' + baseFile + '/' + re.sub('_HH','',inHHFile)
+                    if createStack:
+                        self.createStack(inBaseFile)
+                except IndexError:
+                    print(" ERROR: Not all files found!")
 
 if __name__ == '__main__':
     obj = BatchRunCommand()
     createStack=False
     if len(sys.argv) >= 2:
-        inDIR = sys.argv[1]
+        inDIR = os.path.abspath(sys.argv[1])
         if len(sys.argv) == 3:
             if sys.argv[2].strip() == '-stack':
                 createStack = True
