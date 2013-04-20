@@ -24,27 +24,33 @@
 import os, sys, csv, glob
 from rios import rat
 import tempfile as tempfile
+sys.path.append(os.sys.path[0])
+import ssurgofields as sf
 
-if len(sys.argv) == 4:
+if len(sys.argv) == 3:
     inDIRName = sys.argv[1] 
     outColName = sys.argv[2] 
-    outColNum = int(sys.argv[3]) 
     outRes = '30' # Set default to 30 m
-elif len(sys.argv) >= 5:
+elif len(sys.argv) >= 4:
     inDIRName = sys.argv[1] 
     outColName = sys.argv[2] 
-    outColNum = int(sys.argv[3]) 
     outRes = str(sys.argv[4])
 else:
     print '''Create Raster Atttribute Table (RAT) in KEA format from SSURGO data.
 If the KEA file exists, new attributes are appended to the RAT.
 
 Usage:
-    python convertSSURGO2RAT.py inBaseDIR outColName outColNum [outRes]
+    python convertSSURGO2RAT.py inBaseDIR outColName [outRes]
 Where outColName and outColNum are the required attributes in the table 'chorizon'
 The output resolution defaults to 30, assuming the input projection is in m.
 '''
     exit()
+
+# Import dictionary of values
+cHorizonFields = sf.getCHorizonDict()
+
+# Get field from dictionary
+outColNum = cHorizonFields[outColName.strip()]
 
 # CREATE RASTER ATTRIBUTE TABLE
 inSpatialDIR = os.path.join(inDIRName,'spatial')

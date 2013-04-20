@@ -46,24 +46,26 @@ except IOError:
     exit()
 
 try:
+    # Get coordinates from float image based on pixel in tie point file
     floatXCoords = minX + (inGCPs[:,2] * pixSizeX) 
     floatYCoords = maxY + (inGCPs[:,3] * pixSizeY) 
     
-    # Calculate differences
+    # Calculate differences between base image coordinates (stored in tie point file)
+    # and coordinates in floating image.
     diffX = floatXCoords - inGCPs[:,0]
     diffY = floatYCoords - inGCPs[:,1]
     
+    # Express difference in pixels
     diffXPix = diffX / pixSizeX
     diffYPix = diffY / pixSizeY
     
+    # Calculate aplitude and phase (for plottong)
     phaseDiffPix = np.arctan(abs(diffYPix) / abs(diffXPix)) * 180. / np.pi
     
     phaseDiffPix = np.where(np.logical_and(diffXPix < 0, diffYPix < 0) ,phaseDiffPix + 180.,phaseDiffPix)
     phaseDiffPix = np.where(np.logical_and(diffXPix < 0, diffYPix > 0) ,phaseDiffPix + 90, phaseDiffPix)
     phaseDiffPix = np.where(np.logical_and(diffXPix > 0, diffYPix < 0) ,phaseDiffPix + 270, phaseDiffPix)
         
-        
-    
     powerDiffPix = np.sqrt((diffXPix + diffYPix)**2)
     
     sqDiffX = (inGCPs[:,0] - floatXCoords)**2
