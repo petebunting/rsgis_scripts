@@ -3,7 +3,7 @@ RSGIS Scripts
 https://bitbucket.org/petebunting/rsgis_scripts/
 ==================================================
 
-Unless otherwise stated, all scripts are made availale under
+Unless otherwise stated, all scripts are made available under
 the following licence:
 
 Copyright (c) 2013 Peter Bunting and Daniel Clewley
