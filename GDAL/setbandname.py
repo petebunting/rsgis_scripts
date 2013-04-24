@@ -16,6 +16,8 @@ import osgeo.gdal as gdal
 import argparse
 # Import the System library
 import sys
+# Import the CSV library
+import csv
 
 # A function to set the no data value
 # for each image band.
@@ -33,11 +35,11 @@ def setBandName(inputFile, band, name):
             imgBand.SetDescription(name)
         else:
             # Print out an error message.
-            print "Could not open the image band: ", band
+            print("Could not open the image band: ", band)
     else:
         # Print an error message if the file 
         # could not be opened.
-        print "Could not open the input image file: ", inputFile
+        print("Could not open the input image file: ", inputFile)
 
 # This is the first part of the script to 
 # be executed.
@@ -54,33 +56,57 @@ if __name__ == '__main__':
     # Define the argument for specifying band name.
     parser.add_argument("-n", "--name", type=str, 
                         help="Specify the band name.")
+    parser.add_argument("-f", "--namesfile",type=str,
+                        help="Text file containing band numbers and names, seperated by a comma")
     # Call the parser to parse the arguments.
     args = parser.parse_args()
+
+    useBandNamesFile=True
     
     # Check that the input parameter has been specified.
     if args.input == None:
         # Print an error message if not and exit.
-        print "Error: No input image file provided."
-        print parser.print_help()
+        print("Error: No input image file provided.")
+        print(parser.print_help())
         sys.exit()
         
-    # Check that the band parameter has been specified.
-    if args.band == None:
-        # Print an error message if not and exit.
-        print "Error: the band was not specified."
-        print parser.print_help()
-        sys.exit()
-        
-    # Check that the name parameter has been specified.
-    if args.name == None:
-        # Print an error message if not and exit.
-        print "Error: the band name was not specified."
-        print parser.print_help()
-        sys.exit()
+    # Check for a text file containing band names
+    if args.namesfile == None:
+        useBandNamesFile=False
+
+    if useBandNamesFile == False:
+        # Check that the band parameter has been specified.
+        if args.band == None:
+            # Print an error message if not and exit.
+            print("Error: the band was not specified, and a file containing band names was not provided.")
+            print(parser.print_help())
+            sys.exit()
+            
+        # Check that the name parameter has been specified.
+        if args.name == None:
+            # Print an error message if not and exit.
+            print("Error: the band name was not specified and a file containing band names was not provided.")
+            print(parser.print_help())
+            sys.exit()
+
+    if useBandNamesFile and (args.name != None or args.band != None):
+        print("WARNING: Using band names from text file only")
         
     # Otherwise, run the function to set the band
     # name.
-    setBandName(args.input, args.band, args.name)
+    if useBandNamesFile:
+        bandNamesFile=csv.reader(open(args.namesfile,'rU'))
+        for line in bandNamesFile:
+            bandNum=line[0]
+            bandName=line[1]
+            if line[0].isdigit():
+                print('Setting band: ' + bandNum + ' to: ' + bandName)
+                setBandName(args.input, int(bandNum), bandName)
+            else:
+                print('"'+line[0]+'" is not a valid band number')
+
+    else:
+        setBandName(args.input, args.band, args.name)
 
 
 
