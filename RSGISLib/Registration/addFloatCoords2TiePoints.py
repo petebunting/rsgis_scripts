@@ -66,7 +66,7 @@ try:
     phaseDiffPix = np.where(np.logical_and(diffXPix < 0, diffYPix > 0) ,phaseDiffPix + 90, phaseDiffPix)
     phaseDiffPix = np.where(np.logical_and(diffXPix > 0, diffYPix < 0) ,phaseDiffPix + 270, phaseDiffPix)
         
-    powerDiffPix = np.sqrt((diffXPix + diffYPix)**2)
+    powerDiffPix = np.sqrt(diffXPix**2 + diffYPix**2)
     
     sqDiffX = (inGCPs[:,0] - floatXCoords)**2
     sqDiffY = (inGCPs[:,1] - floatYCoords)**2
