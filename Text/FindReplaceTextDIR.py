@@ -58,9 +58,9 @@ class FindReplaceTextDIR (object):
                         if inExt.findExt(filename):
                             filelist.append(os.path.join(directory,filename))
             else:
-                print directory + ' is not a directory!'
+                print(directory + ' is not a directory!')
         else:
-            print directory + ' does not exist!'
+            print(directory + ' does not exist!')
     
     def readFindReplaceText(self, findReplaceList, inFRTextFile):
         inFile = open(inFRTextFile, 'rU')
@@ -86,7 +86,7 @@ class FindReplaceTextDIR (object):
             outFileString = fritem.frReplace(outFileString)
         
         if outFileString != inFileString:
-            print "Replacing text in: ", inFileName        
+            print("Replacing text in: ", inFileName)
             # Write out file (if something has changed)
             outFile = open(inFileName, 'w')
             outFile.write(outFileString)
@@ -113,15 +113,15 @@ class FindReplaceTextDIR (object):
             self.help()
     
     def help(self):
-        print '''Find and replace strings within all text files with the extensions:'''
-        print ' ' + extListString
-        print '''in input directory.
+        print('''Find and replace strings within all text files with the extensions:''')
+        print(' ' + extListString)
+        print('''in input directory.
 Usage:
  python FindReplaceTextDIR <inDIR> <inFindReplaceList>
 Strings to find and replace provided as text file (inFindReplaceList) in the
 format:
 findString#replaceString
-'''
+''')
 
 if __name__ == '__main__':
     obj = FindReplaceTextDIR()

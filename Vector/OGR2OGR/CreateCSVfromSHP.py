@@ -48,14 +48,15 @@ class CreateCSVfromSHP (object):
         fileList = os.listdir(inDIR)
         for fileName in fileList:
             if self.checkFileExtension(fileName, 'shp'):
-                print fileName
+                print(fileName)
                 self.createCSV(inDIR, fileName) 
 
     def help(self):
-        print '--CreateCSVfromSHP--'
-        print 'Create CSV files for all shapefile in\na directory.'
-        print 'Usage:'
-        print ' python CreateCSVfromSHP.py <inputDIR>'
+        print('''--CreateCSVfromSHP--
+Create CSV files for all shapefile in a directory.
+
+Usage:
+    python CreateCSVfromSHP.py <inputDIR>''')
 
 if __name__ == '__main__':    
     obj = CreateCSVfromSHP()

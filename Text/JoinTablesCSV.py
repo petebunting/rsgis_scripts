@@ -46,7 +46,6 @@ class JoinTables (object):
                         break
     
     def writeOutData(self, data, outFileName):
-        #print 'Writing data to: ' + outFileName
         outFile = csv.writer(open(outFileName, 'w'))
         for i in range(len(data)):
             outFile.writerow(data[i])
@@ -57,23 +56,23 @@ class JoinTables (object):
         matchFeatureList = list()
         matchDataList = list()
         
-        print 'Matching column: ', matchSearchFeature, ' with: ',  refSearchFeature, ' in refference data'
+        print('Matching column: ', matchSearchFeature, ' with: ',  refSearchFeature, ' in refference data')
         
         # Read in refference data
-        print 'Reading in data'
+        print('Reading in data')
         self.readInData (inRefFileName, refFeatureList, refDataList, refSearchFeature)
         self.readInData (inMatchFileName, matchFeatureList, matchDataList, matchSearchFeature)
         
         # Match Features
-        print 'Matching Features'
+        print('Matching Features')
         self.loopThroughData(refFeatureList, refDataList, matchFeatureList, matchDataList)
         
         # Write out data
-        print 'Saving data to: ' + outFileName
+        print('Saving data to: ' + outFileName)
         self.writeOutData(refDataList, outFileName)
         
     def help(self):
-        print 'python JoinTables.py <inRefFileName> <inMatchFileName> <outFileName> <refSearchFeature> <matchSearchFeature>'
+        print('python JoinTables.py <inRefFileName> <inMatchFileName> <outFileName> <refSearchFeature> <matchSearchFeature>')
     
 if __name__ == '__main__':
     obj = JoinTables()

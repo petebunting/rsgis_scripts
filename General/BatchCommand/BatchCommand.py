@@ -8,7 +8,7 @@
 # 19/02/2012
 #######################################
 
-import os, sys, optparse, subprocess
+import os, sys, argparse, subprocess
 
 class BatchRunCommand (object):
     def findExtension(self, filename, ext):
@@ -37,49 +37,43 @@ class BatchRunCommand (object):
                     fullCommand = command + ' \"' + outFilePath + '\" \"' + inFilePath + '\"'
                 else:  
                     fullCommand = command + ' \"' + inFilePath + '\" \"' + outFilePath + '\"'
-                print 'Running: ' + fullCommand
+                print('Running: ' + fullCommand)
                 os.system(fullCommand)
 
-# Command arguments
-class CmdArgs:
-  def __init__(self):
-    p = optparse.OptionParser()
-    p.add_option("-c","--command", dest="command", default=None, help="Command line to use, last two inputs of the command should be left blank for input and output file")
-    p.add_option("-e","--ext", dest="extension", default=None, help="Input file extension (e.g., \'env\')") 
-    p.add_option("-s","--suffix", dest="suffix", default=None, help="Suffix for output files, including extension (e.g., \'_tif.tif\')")
-    p.add_option("-i","--inputDIR", dest="inDIR", default=None, help="Input directory. Can use '.' for current directory")
-    p.add_option("-o","--outputDIR", dest="outDIR", default=None, help="Output directory. Can use '.' for current directory")
-    p.add_option("-r","--reverse", dest="reverse", default=False, help="Reverse - command takes output first, then input")
-    (options, args) = p.parse_args()
-    self.__dict__.update(options.__dict__)
-
-    if self.command is None:
-        p.print_help()
-        print "Command must be set"
-        sys.exit()
-
-    if self.extension is None:
-        p.print_help()
-        print "Extension must be set"
-        sys.exit()
-
-    if self.suffix is None:
-        p.print_help()
-        print "Suffix must be set"
-        sys.exit()
-
-    if self.inDIR is None:
-        p.print_help()
-        print "Input directory must be set"
-        sys.exit()
-
-    if self.outDIR is None:
-        p.print_help()
-        print "Output directory must be set"
-        sys.exit()
-
-
 if __name__ == '__main__':
-    cmdargs = CmdArgs()
+    p = argparse.ArgumentParser()
+    p.add_argument("-c","--command", dest="command", type=str, default=None, help="Command line to use, last two inputs of the command should be left blank for input and output file")
+    p.add_argument("-e","--ext", dest="extension", default=None, help="Input file extension (e.g., \'env\')") 
+    p.add_argument("-s","--suffix", dest="suffix", default=None, help="Suffix for output files, including extension (e.g., \'_tif.tif\')")
+    p.add_argument("-i","--inputDIR", dest="inDIR", default=None, help="Input directory. Can use '.' for current directory")
+    p.add_argument("-o","--outputDIR", dest="outDIR", default=None, help="Output directory. Can use '.' for current directory")
+    p.add_argument("-r","--reverse", dest="reverse", default=False, help="Reverse - command takes output first, then input")
+    cmdargs = p.parse_args()
+
+    if cmdargs.command is None:
+        print("Command must be set")
+        p.print_help()
+        sys.exit()
+
+    if cmdargs.extension is None:
+        print("Extension must be set")
+        p.print_help()
+        sys.exit()
+
+    if cmdargs.suffix is None:
+        print("Suffix must be set")
+        p.print_help()
+        sys.exit()
+
+    if cmdargs.inDIR is None:
+        print("Input directory must be set")
+        p.print_help()
+        sys.exit()
+
+    if cmdargs.outDIR is None:
+        print("Output directory must be set")
+        p.print_help()
+        sys.exit()
+
     obj = BatchRunCommand()
     obj.runCommand(cmdargs.command, cmdargs.inDIR, cmdargs.outDIR, cmdargs.extension, cmdargs.suffix, cmdargs.reverse)

@@ -4,10 +4,10 @@ import sys
 from osgeo import gdal
 
 if len(sys.argv) < 2:
-	print '''Error: No image provided:
+	print('''Error: No image provided:
 Usage:
 	setthematic.py image.kea
-'''
+''')
 	exit()
 
 ds = gdal.Open(sys.argv[1], gdal.GA_Update)

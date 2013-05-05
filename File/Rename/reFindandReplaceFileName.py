@@ -14,7 +14,7 @@ import re
 
 numArgs = len(sys.argv)
 if numArgs != 4:
-    print '''
+    print('''
 
 A python script to change filenames in a directory based on regular expressions
 Usage:
@@ -24,7 +24,7 @@ eg.,
 
 python reFindandReplaceFileName.py /data/ '\.ptxt' '\.csv'
     
-'''
+''')
     exit()
 
 inDIR = sys.argv[1]
