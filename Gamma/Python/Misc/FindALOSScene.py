@@ -24,10 +24,10 @@ for eachLine in inFile:
     
     outLine = re.sub('\n','',eachLine)
     
-    print 'Searching for ' + fileName + '...'
+    print('Searching for ' + fileName + '...')
     
     findFileCommand = 'find ' + searchDIR + ' -name \'' + fileName + '*.tar.gz\''
-    print findFileCommand
+    print(findFileCommand)
     out = os.popen(findFileCommand)
     #print 'File Location: ' + re.sub('\n','',str(out.readline()))
     outLine = outLine + ',' + re.sub('\n','',str(out.readline()))

@@ -82,7 +82,7 @@ class CreateSARKMLHHOnly (object):
             extmatch = self.findExtension(file, ext)
             if extmatch:
                 if file.find('.topo.hh') > 0:
-                    print file
+                    print(file)
                     inFilename = file
                     baseFile = self.removeExtension(file, ext)
                     baseFile = re.sub('\.\Z','', baseFile) # Remove dot at end of string
@@ -97,20 +97,20 @@ class CreateSARKMLHHOnly (object):
                     if ext == '.hdr':
                         inFilename = baseFile
                     command = command_gdal + command_of + command_ot + command_scale + ' ' + inFilePath + '/' + inFilename + ' ' + outDIR + '/' + baseFile + '_kml.kml'
-                    print command
+                    print(command)
                     os.system(command)
             
     def run(self, inFilePath, outFilePath, inputExtension):
             if os.path.exists(inFilePath) and os.path.isdir(inFilePath) and os.path.exists(outFilePath) and os.path.isdir(outFilePath):
-                print 'File paths are OK'
+                print('File paths are OK')
                 fileList = os.listdir(inFilePath)
                 self.convertfiles(inFilePath, fileList, outFilePath, inputExtension)
             else:
-                print 'Check file paths.. Exiting...'
+                print('Check file paths.. Exiting...')
                 self.help()
 
     def help(self):
-        print 'python CreateSARKMLHHOnly.py <inputDIR> <outputDIR> <input_Extension>'
+        print('python CreateSARKMLHHOnly.py <inputDIR> <outputDIR> <input_Extension>')
 
 if __name__ == '__main__':    
     obj = CreateSARKMLHHOnly()

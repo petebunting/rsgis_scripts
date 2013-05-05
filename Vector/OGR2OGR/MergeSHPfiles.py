@@ -90,9 +90,9 @@ class MergeSHPfiles (object):
                     elif(self.checkFileExtension(filename, extension)):
                         fileList.append(os.path.join(directory,filename))
             else:
-                print directory + ' is not a directory!'
+                print(directory + ' is not a directory!')
         else:
-            print directory + ' does not exist!'
+            print(directory + ' does not exist!')
 
     # A function to control the merging of shapefiles
     def mergeSHPfiles(self, filePath, newSHPfile):
@@ -109,7 +109,7 @@ class MergeSHPfiles (object):
        command = ''
        # Iterate through the files.
        for file in fileList:
-           print "Adding:" + file 
+           print("Adding:" + file) 
            if first and formatStr.find('SQLite') < -1:
                # If the first file make a copy to create the output file
                # Don't need to create copy for SQLite
@@ -139,15 +139,15 @@ class MergeSHPfiles (object):
             
             # Check input file path exists and is a directory
             if not os.path.exists(filePath):
-                print 'Filepath does not exist'
+                print('Filepath does not exist')
             elif not os.path.isdir(filePath):
-                print 'Filepath is not a directory!'
+                print('Filepath is not a directory!')
             else:
                 # Merge the shapefiles within the filePath
                 self.mergeSHPfiles(filePath, newSHPfile)
         else:
-            print "ERROR. Command should have the form:"
-            print "python MergeSHPfiles_cmd.py <Input File Path> <Output File>"
+            print("ERROR. Command should have the form:")
+            print("python MergeSHPfiles_cmd.py <Input File Path> <Output File>")
 
 # The start of the code
 if __name__ == '__main__':

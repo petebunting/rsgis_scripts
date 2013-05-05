@@ -29,7 +29,7 @@ class BatchRunCommand (object):
         os.system(mvCommand)
         os.chdir(inDIR + '/' + fileName)
         unzipCommand = 'tar -xvf ' + fileName + '.tar.gz'
-        print unzipCommand
+        print(unzipCommand)
         os.system(unzipCommand)
         removeCommand = 'rm ' + fileName + '.tar.gz'
         os.system(removeCommand)
@@ -152,8 +152,8 @@ wavelength units = Unknown
         import subprocess
         out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         (stdout, stderr) = out.communicate()
-        print stdout
-        print stderr
+        print(stdout)
+        print(stderr)
 
     def run(self, inDIR):
         filelist = []
@@ -162,7 +162,7 @@ wavelength units = Unknown
         fileList = glob.glob('KC*') #os.listdir(inDIR)
         
         for fileName in fileList:
-            print fileName
+            print(fileName)
             inFile = fileName
             baseFile = fileName #re.sub('\.tar\.gz','',fileName)
             #self.unTar(inDIR, baseFile)

@@ -30,7 +30,7 @@ class SubsetPAN (object):
         if(os.path.isfile(testFile)):
             return True
         else:
-            print 'Could not find ' + testFile
+            print(('Could not find ' + testFile))
             raise BaseException
     
     def getCorners(self, gammaCornerFile, outCorners):
@@ -53,8 +53,8 @@ class SubsetPAN (object):
                         outCorners.append(float(elements[3].strip()) + 0.1)
                             
                 gammaCorners.close()
-            except IOError, e:
-                print '\nCould not open corners file: ', e
+            except IOError as e:
+                print(('\nCould not open corners file: ', e))
                 raise IOError(e)
         else:
             raise BaseException            
@@ -68,7 +68,7 @@ class SubsetPAN (object):
             subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, corners[2], corners[0], corners[3], corners[1], dataSizeDeg, dataSizeDeg, srtmName, srtmSubName)
         else:
             subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, corners[2], corners[0], corners[3], corners[1], dataSizeDeg, dataSizeDeg, srtmName, srtmSubName)
-            print subCMD
+            print(subCMD)
         os.system(subCMD)
         
     def reProjectReSample(self, srtmSubName, reProjSRTM, projFile):
@@ -76,7 +76,7 @@ class SubsetPAN (object):
             subCMD = 'gdalwarp -t_srs %s -tr 12.5 12.5 -order 3 -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, srtmSubName, reProjSRTM)
         else:
             subCMD = 'gdalwarp -t_srs %s -tr 12.5 12.5 -order 3 -of ENVI -ot UInt16 %s %s' % (projFile, srtmSubName, reProjSRTM)
-            print subCMD
+            print(subCMD)
         os.system(subCMD)          
     
     def run(self, inSRTMFile, outPANSub, gammaCornerFile, llProjFile, utmProjFile, res=30):
@@ -92,18 +92,18 @@ class SubsetPAN (object):
         try:
             os.remove(outPANSub)
             if self.quiet == False:
-                print 'replacing existing file: ' + outPANSub
-        except OSError, e:
+                print(('replacing existing file: ' + outPANSub))
+        except OSError as e:
             if self.quiet == False:
-                print 'saving to ' + outPANSub
+                print(('saving to ' + outPANSub))
             
         try:
             os.remove(tempPAN)
             if self.quiet == False:
-                print 'replacing existing file: ' + tempPAN
-        except OSError, e:
+                print(('replacing existing file: ' + tempPAN))
+        except OSError as e:
             if self.quiet == False:
-                print 'saving temp file: ' + tempPAN + ', will remove after'
+                print(('saving temp file: ' + tempPAN + ', will remove after'))
         
         # Get corners from corners file
         outCorners = []
@@ -119,18 +119,18 @@ class SubsetPAN (object):
         try:
             os.remove(tempPAN)
             if self.quiet == False:
-                print 'removing temp file: ' + tempPAN
+                print(('removing temp file: ' + tempPAN))
             try:
                 os.remove(tempPANhdr)
-            except OSError, e:
+            except OSError as e:
             	if self.quiet == False:
-            	   print 'can\'t remove temp header file: ' + tempPAN + '.env'
-        except OSError, e:
+            	   print(('can\'t remove temp header file: ' + tempPAN + '.env'))
+        except OSError as e:
             if self.quiet == False:
-                print 'can\'t remove temp file: ' + tempPAN
+                print(('can\'t remove temp file: ' + tempPAN))
 
     def help(self):
-        print 'python SubsetPAN.py <inSRTMFile> <outPANSub> <gammaCornerFile> <llProjFile> <utmProjFile>'
+        print('python SubsetPAN.py <inSRTMFile> <outPANSub> <gammaCornerFile> <llProjFile> <utmProjFile>')
         
 if __name__ == '__main__':
     obj = SubsetPAN()

@@ -40,11 +40,11 @@ class GenerateENVIHeader (object):
 							#print 'FOUND FILE - ADD TO LIST!'
 							filelist.append(os.path.join(directory,filename))
 					else:
-						print filename + ' is NOT a file or directory!'
+						print((filename + ' is NOT a file or directory!'))
 			else:
-				print directory + ' is not a directory!'
+				print((directory + ' is not a directory!'))
 		else:
-			print directory + ' does not exist!'
+			print((directory + ' does not exist!'))
 	
 	def stripdeg(self, instring):
 		stringstrip = instring.split(' ')
@@ -56,15 +56,15 @@ class GenerateENVIHeader (object):
 			try:
 				parFile = open(parFilename, 'r') 
 				for eachLine in parFile:
-					print eachLine
+					print(eachLine)
 					count = eachLine.count(':')
-					print 'count = ' + str(count)
+					print(('count = ' + str(count)))
 					if(count == 1):
 						#print 'Two elements'
 						elements = eachLine.split(':', count)
 						elements[0] = elements[0].strip()
 						elements[1] = elements[1].strip()
-						print '1: \'' + elements[0] + '\' 2:\'' + elements[1] + '\''
+						print(('1: \'' + elements[0] + '\' 2:\'' + elements[1] + '\''))
 						if(elements[0] == 'title'):
 							outputParameters.append(elements[1])
 						elif(elements[0] == 'sensor'):
@@ -78,18 +78,18 @@ class GenerateENVIHeader (object):
 						elif(elements[0] == 'image_format'):
 							outputParameters.append(elements[1])
 				parFile.close()
-			except IOError, e:
-				print '\nCould not open file: ', e
+			except IOError as e:
+				print(('\nCould not open file: ', e))
 				raise IOError(e)
 		else:
 			raise BaseException
 	
 	def generateENVIHeadersNoSpatial(self, filelist):
 		for filename in filelist:
-			print '\n\n'
-			print filename
+			print('\n\n')
+			print(filename)
 			outputFileName = os.path.splitext(filename)[0] +'.hdr'
-			print outputFileName
+			print(outputFileName)
 			try:
 				parameters = list()
 				self.getALOSPAR_NoSpatial(filename+'.par', parameters)
@@ -108,7 +108,7 @@ class GenerateENVIHeader (object):
 				elif(parameters[5] == 'FCOMPLEX'):
 					outputFile.write( 'data type = 6\n' )
 				else:
-					print 'Data type not recognised. Only FLOAT and FCOMPLEX supported.'
+					print('Data type not recognised. Only FLOAT and FCOMPLEX supported.')
 					sys.exit(-1)
 				outputFile.write( 'interleave = bsq\n' )
 				outputFile.write( 'sensor type = Unknown\n' )
@@ -119,9 +119,9 @@ class GenerateENVIHeader (object):
 				outputFile.write('\n\n')
 				outputFile.flush()
 				outputFile.close()
-			except BaseException, e:
-				print 'Could not retrieve ALOS parameters to generate ENVI Header\n'
-				print e
+			except BaseException as e:
+				print('Could not retrieve ALOS parameters to generate ENVI Header\n')
+				print(e)
 	
 	def findSpatialParamsFile(self, imageFile):
 		#print str(imageFile)
@@ -184,8 +184,8 @@ class GenerateENVIHeader (object):
 						#	outputParameters.append(elements[1])
 						
 				parFile.close()
-			except IOError, e:
-				print '\nCould not open file: ', e
+			except IOError as e:
+				print(('\nCould not open file: ', e))
 				raise IOError(e)
 		else:
 			raise BaseException
@@ -193,11 +193,11 @@ class GenerateENVIHeader (object):
 	def generateENVIHeaderSpatial(self, filelist):
 		try:
 			for filename in filelist:
-				print filename
+				print(filename)
 				parfile = self.findSpatialParamsFile(filename)
-				print parfile
+				print(parfile)
 				outputFileName = os.path.splitext(filename)[0] +'.utm.hdr'
-				print outputFileName
+				print(outputFileName)
 				parameters = list()
 				self.getALOSPAR_Spatial(parfile, parameters)
 				outputFile = open(outputFileName, 'w')
@@ -215,8 +215,8 @@ class GenerateENVIHeader (object):
 				outputFile.write( 'map info = {Geographic Lat/Lon, 1.5000, 1.5000, ' + str(parameters[4]) + ', ' + str(parameters[3]) + ', '+ str(parameters[6]) + ', '+ str(parameters[6]) + ', ' + str(parameters[7]) + ', units=Degrees}\n' )
 				outputFile.write( 'wavelength units = Unknown\n')
 
-		except IOError, e:
-			print 'IOError Occurred: ' + str(e)
+		except IOError as e:
+			print(('IOError Occurred: ' + str(e)))
 			
 	def run(self, spatial, directory, extension):
 		filelist = list()

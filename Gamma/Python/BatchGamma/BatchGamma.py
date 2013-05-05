@@ -69,14 +69,14 @@
 import os, sys, string, re, glob
 from time import gmtime, strftime
 
-print '''Script to process FBD ALOS scenes
+print('''Script to process FBD ALOS scenes
 python BatchGammaFBD.py <inDIR> <inSceneList> <processDIR> <outDIR> <parameter file>
  Input parameters:
  1) inDIR: directory containing raw, gzipped, data
  2) inSceneList: text file containing scenes to be processed, type '-' to process all scenes in inDIR
  3) processDIR: directory to process files
  4) outDIR: directory to copy files back to, type '-' to skip copying back
- 5) Parameter file'''
+ 5) Parameter file''')
 
 #########################################################################################
 
@@ -86,7 +86,7 @@ alosFilePrefix = 'alps'
 # Check for the correct number of parameters
 numArgs = len(sys.argv)
 if numArgs != 6:
-    print "Not enough parameters supplied!"
+    print("Not enough parameters supplied!")
     exit()
 
 parameterFileName = sys.argv[5]
@@ -176,16 +176,16 @@ for line in parameterFile:
             metaContactEmail = elements[1].strip()
 
 if rawSLCTemplateSet == False:
-    print "ERROR: No SLC template set. Set using 'rawSLCTemplate' in parameter file"
+    print("ERROR: No SLC template set. Set using 'rawSLCTemplate' in parameter file")
     exit() 
 if slcGeoTemplateSet == False:
-    print "ERROR: No georefferencing template set. Set using 'slcGeoTemplate' in parameter file"
+    print("ERROR: No georefferencing template set. Set using 'slcGeoTemplate' in parameter file")
     exit()
 if srtmSet == False:
-    print "ERROR: No DEM provided. Set using 'dem' in parameter file"
+    print("ERROR: No DEM provided. Set using 'dem' in parameter file")
     exit()
 if panSet == False:
-    print "WARNING: No panchromatic mosic provided. If required for georefferencing Set using 'pan' in parameter file"
+    print("WARNING: No panchromatic mosic provided. If required for georefferencing Set using 'pan' in parameter file")
     exit()
 
 #######################################################################################################
@@ -218,21 +218,21 @@ else:
         processScenes.append(line.strip())
 
 for scene in processScenes:
-    print '###########################################################'
-    print ' Processing ' + scene 
-    print ' Started processing at: ' +  str(strftime("%H:%M:%S", gmtime()))
-    print '###########################################################'
+    print('###########################################################')
+    print((' Processing ' + scene)) 
+    print((' Started processing at: ' +  str(strftime("%H:%M:%S", gmtime()))))
+    print('###########################################################')
     cpSceneCMD = 'cp ' + inDIR + '/' + scene + '* ' + processDIR
     unTarCMD = 'tar -xf ' + scene + '.tar.gz'
     sceneDIR = processDIR + '/' + scene + '/'
     dataDIR = processDIR + '/' + scene + '/l1data'
     
-    print '----------------------------------'
-    print '1) Getting data...'    
-    print ' a) Copying file...'
+    print('----------------------------------')
+    print('1) Getting data...')    
+    print(' a) Copying file...')
     os.system(cpSceneCMD)
     os.chdir(processDIR)
-    print ' b) Un-tarring file...'
+    print(' b) Un-tarring file...')
     os.system(unTarCMD)
     # Remove tar file
     os.remove(scene + '.tar.gz')
@@ -252,7 +252,7 @@ for scene in processScenes:
         newScene = re.sub('\n','',str(out.readline()))
         sceneDIR = processDIR + '/' + newScene + '/'
         
-        print 'Could not find ' + scene + ' processing, assuming name has changed to: ' + newScene
+        print(('Could not find ' + scene + ' processing, assuming name has changed to: ' + newScene))
         
     if subDIR == False:
         # If no directory called l1data, create one and move all data into it
@@ -265,7 +265,7 @@ for scene in processScenes:
         os.system(mvCMD2)
         os.system(mvCMD3) 
                 
-    print ' Data DIR = ' + dataDIR
+    print((' Data DIR = ' + dataDIR))
     os.chdir(dataDIR)
     
     # Create temp output files
@@ -282,8 +282,8 @@ for scene in processScenes:
     alphaEntropyScript = 'genAlphaEntropy.csh'
     geocodeAlphaEntropyScript = 'geoAlphaEntropy.csh'
     
-    print '----------------------------------'
-    print '2) Creating GAMMA scripts...'
+    print('----------------------------------')
+    print('2) Creating GAMMA scripts...')
     # Check processing level of data
     LEDFileList = glob.glob('LED*')
     if len(LEDFileList) > 0:
@@ -363,24 +363,24 @@ for scene in processScenes:
     os.system(rmTempCMD)
     
     # Run SLC
-    print '----------------------------------'
-    print '3) Running script to generate SLC...'
+    print('----------------------------------')
+    print('3) Running script to generate SLC...')
     runSLCCMD = 'csh ' + rawSLCScript + ' > slc.log'
     os.system(runSLCCMD)
         
     # Alpha-Entropy
     if genAlphaEntropy:
-        print ' Generating alpha-Entropy image...'
+        print(' Generating alpha-Entropy image...')
         runAlphaEntropyCMD = 'csh ' + alphaEntropyScript + ' > alphaEntropy.log'
         os.system(runAlphaEntropyCMD)
         
     # Run GEO
-    print '----------------------------------'
-    print '4) Running script to geocode SLC...'
+    print('----------------------------------')
+    print('4) Running script to geocode SLC...')
     
     # Subset DEM if required.
     if subsetDEM:
-        print ' a) creating SRTM subset...'
+        print(' a) creating SRTM subset...')
         subDEM = SubsetDEM()
         srtmSub = dataDIR + '/' + scene + '_srtm_sub'
         srtmSubHeader = srtmSub + '.hdr'
@@ -389,13 +389,13 @@ for scene in processScenes:
         subDEM.run(srtm, srtmSub, gammaCornerFile, llProjFile, utmProjFile, res)
         genPar = GenerateDEMParFile()
         genPar.run(srtmSubHeader, srtmSubPar)
-        print ' b) post-processing SRTM...'
+        print(' b) post-processing SRTM...')
         runPostProcessDEMCMD = 'csh ' + postProcessDEMScript + ' > dem.log'
         os.system(runPostProcessDEMCMD)
-        print ' c) starting geocoding...'
+        print(' c) starting geocoding...')
     
     if subsetPAN:
-        print ' a) creating PAN subset...'
+        print(' a) creating PAN subset...')
         subPAN = SubsetPAN()
         panSub = dataDIR + '/' + scene + '_pan_sub'
         panSubHeader = panSub + '.hdr'
@@ -404,27 +404,27 @@ for scene in processScenes:
         subPAN.run(pan, panSub, gammaCornerFile, llProjFile, utmProjFile, res)
         genPar = GenerateDEMParFile()
         genPar.run(panSubHeader, panSubPar)
-        print ' b) post-processing PAN...'
+        print(' b) post-processing PAN...')
         runPostProcessPANCMD = 'csh ' + postProcessPANScript + ' > dem.log'
         os.system(runPostProcessPANCMD)
-        print ' c) starting geocoding...'
+        print(' c) starting geocoding...')
     
     runGEOCMD = 'csh ' + slcGeoScript + ' > geo.log'
     os.system(runGEOCMD)
     
     if genAlphaEntropy: 
-        print ' Geocoding alpha-Entropy image...' # Geocode alpha entropy image
+        print(' Geocoding alpha-Entropy image...') # Geocode alpha entropy image
         runAlphaEntropyCMD = 'csh ' + geocodeAlphaEntropyScript + ' > geoAlphaEntropy.log'
         os.system(runAlphaEntropyCMD)
     
     if topoCorrect:
-        print ' d) topographically correcting data...'
+        print(' d) topographically correcting data...')
         runTopoCorrectCMD = 'csh ' + topoCorrectScript + ' > topo.log'
         os.system(runTopoCorrectCMD)
               
     # Generate ENVI Header
-    print '----------------------------------'
-    print '5) Generating ENVI Header'
+    print('----------------------------------')
+    print('5) Generating ENVI Header')
     if zone == 'LatLong' or zone == 'LL':
         header = GenerateENVIHeaderLatLong()
         header.run('spatial', dataDIR, 'utm')
@@ -436,16 +436,16 @@ for scene in processScenes:
         header.run('spatial', dataDIR, 'inc')
         header.run('spatial', dataDIR, 'pix')
     
-    print '----------------------------------'
-    print '6) Generating QuickLooks'
+    print('----------------------------------')
+    print('6) Generating QuickLooks')
     quickLook = CreateQuickLook()
     quickLook.run(dataDIR, dataDIR, 'utm')
             
     # If no output directory is set don't remove files or copy back to server
     if outDIR != '-':
         # Sort data and copy back to server
-        print '----------------------------------'
-        print '7) Sorting data and copying back to server'
+        print('----------------------------------')
+        print('7) Sorting data and copying back to server')
         
         # Move data back a level
         cmdmvdata = 'mv ' +  dataDIR + '/*utm ' + sceneDIR 

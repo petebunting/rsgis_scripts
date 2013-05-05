@@ -51,8 +51,8 @@ class GenerateDEMParFile (object):
                                 i = i + 1
                             
                 parFile.close()
-            except IOError, e:
-                print '\nCould not open file: ', e
+            except IOError as e:
+                print(('\nCould not open file: ', e))
                 raise IOError(e)
         else:
             raise BaseException
@@ -146,8 +146,8 @@ center_latitude:          0.0000000   decimal degrees\n''' % (fileName, outputPa
         self.generateParFile(outputParameters, outParFile)
     
     def help(self):
-	print 'Script to generate GAMMA Par file from ENVI header file'
-        print 'python GenerateParFile.py <inHeaderFile> <outParFile>'
+        print('Script to generate GAMMA Par file from ENVI header file')
+        print('python GenerateParFile.py <inHeaderFile> <outParFile>')
 
 if __name__ == '__main__':
     obj = GenerateDEMParFile()

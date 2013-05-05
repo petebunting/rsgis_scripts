@@ -69,7 +69,7 @@ class CreateKMLLinkFile (object):
         outputKMLLinkFile.write("\t\t<open>1</open>\n")
         outputKMLLinkFile.write("\t\t<visibility>1</visibility>\n")
         for file in fileList:
-    	    print file
+    	    print(file)
 	    kmlPath = os.path.join(file, "doc.kml")
 	    baseFile = re.sub('_kml','',file)
 	    outputKMLLinkFile.write("\t\t<NetworkLink>\n")
@@ -87,15 +87,15 @@ class CreateKMLLinkFile (object):
             
     def run(self, inFilePath, outFile, searchStr, outputPath, prjName):
         if os.path.exists(inFilePath) and os.path.isdir(inFilePath):
-            print 'File paths are OK'
+            print('File paths are OK')
             fileList = os.listdir(inFilePath)
             self.convertfiles(inFilePath, fileList, outFile, searchStr, outputPath, prjName)
         else:
-            print 'Check file paths.. Exiting...'
+            print('Check file paths.. Exiting...')
             self.help()
 
     def help(self):
-        print 'python CreateKMLLinkFile.py <inputDIR> <outputFile> <searchStr> <output_Path> <Name>'
+        print('python CreateKMLLinkFile.py <inputDIR> <outputFile> <searchStr> <output_Path> <Name>')
 
 if __name__ == '__main__':    
     obj = CreateKMLLinkFile()

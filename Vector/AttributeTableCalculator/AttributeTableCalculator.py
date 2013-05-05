@@ -132,7 +132,7 @@ class AttributeTableCalculator(object):
         inSHP.Destroy()
 
     def help(self):
-        print 'python AttributeTableCalculator.py inSHP outSHP outFieldName inFieldName[s]'
+        print('python AttributeTableCalculator.py inSHP outSHP outFieldName inFieldName[s]')
         
         
 if __name__ == '__main__':

@@ -39,11 +39,11 @@ class GenerateENVIHeader (object):
                             #print 'FOUND FILE - ADD TO LIST!'
                             filelist.append(os.path.join(directory,filename))
                     else:
-                        print filename + ' is NOT a file or directory!'
+                        print((filename + ' is NOT a file or directory!'))
             else:
-                print directory + ' is not a directory!'
+                print((directory + ' is not a directory!'))
         else:
-            print directory + ' does not exist!'
+            print((directory + ' does not exist!'))
     
     def getALOSPAR_NoSpatial(self, parFilename, outputParameters):
         if(os.path.isfile(parFilename)):
@@ -73,8 +73,8 @@ class GenerateENVIHeader (object):
                         elif(elements[0] == 'image_format'):
                             outputParameters.append(elements[1])
                 parFile.close()
-            except IOError, e:
-                print '\nCould not open file: ', e
+            except IOError as e:
+                print(('\nCould not open file: ', e))
                 raise IOError(e)
         else:
             raise BaseException
@@ -103,7 +103,7 @@ class GenerateENVIHeader (object):
                 elif(parameters[5] == 'FCOMPLEX'):
                     outputFile.write( 'data type = 6\n' )
                 else:
-                    print 'Data type not recognised. Only FLOAT and FCOMPLEX supported.'
+                    print('Data type not recognised. Only FLOAT and FCOMPLEX supported.')
                     sys.exit(-1)
                 outputFile.write( 'interleave = bsq\n' )
                 outputFile.write( 'sensor type = Unknown\n' )
@@ -114,9 +114,9 @@ class GenerateENVIHeader (object):
                 outputFile.write('\n\n')
                 outputFile.flush()
                 outputFile.close()
-            except BaseException, e:
-                print 'Could not retrieve ALOS parameters to generate ENVI Header\n'
-                print e
+            except BaseException as e:
+                print('Could not retrieve ALOS parameters to generate ENVI Header\n')
+                print(e)
     
     def findSpatialParamsFile(self, imageFile):
         #print str(imageFile)
@@ -182,8 +182,8 @@ class GenerateENVIHeader (object):
                                 outputParameters.append('North')
                         
                 parFile.close()
-            except IOError, e:
-                print '\nCould not open file: ', e
+            except IOError as e:
+                print(('\nCould not open file: ', e))
                 raise IOError(e)
         else:
             raise BaseException
@@ -213,7 +213,7 @@ class GenerateENVIHeader (object):
                 outputFile.write( "map info = {%s, 1.500, 1.500, %s, %s, %e, %e, %s, %s, %s, units=meters}\n" % (str(parameters[8]), str(parameters[4]), str(parameters[3]), float(parameters[6]), float(parameters[6]), str(parameters[9]), str(parameters[10]), str(parameters[7])))
                 outputFile.write( 'wavelength units = Unknown\n')
 
-        except IOError, e:
+        except IOError as e:
             'IOError Occurred: ' + str(e)
             
 
@@ -226,7 +226,7 @@ class GenerateENVIHeader (object):
             self.generateENVIHeadersNoSpatial(filelist)
     
     def help(self):
-        print 'python GenerateENVIHeader.py <spatial / noSpatial> <DIR> <extension>'
+        print('python GenerateENVIHeader.py <spatial / noSpatial> <DIR> <extension>')
         
 
 if __name__ == '__main__':

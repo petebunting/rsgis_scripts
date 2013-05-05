@@ -11,12 +11,12 @@
 import os, sys, glob
 
 if len(sys.argv) < 3:
-    print '''Not enough parameters provided.
+    print('''Not enough parameters provided.
 Usage:
     python catFilesWithHeader.py inSearch outFileName
 e.g.,
     python catFilesWithHeader.py '/data/text*.txt' /joined/all.txt
-'''
+''')
     exit()    
 
 inSearch=sys.argv[1]
@@ -25,9 +25,9 @@ outFileName=sys.argv[2]
 # Open outfile 
 outFile = open(outFileName,'w')
 
-print ' --'
-print inSearch
-print '--'
+print(' --')
+print(inSearch)
+print('--')
 
 fileList = glob.glob(inSearch)
 
@@ -38,16 +38,16 @@ for inFileName in fileList:
     fileCount+=1
     inFile = open(inFileName,'rU')
     if firstFile:
-        outFile.write(inFile.next())
+        outFile.write(next(inFile))
         firstFile = False
     else:
-        inFile.next()
+        next(inFile)
     for line in inFile:
         outFile.write(line)
     inFile.close()
     
 outFile.close()
 
-print 'Wrote ' + str(fileCount) + ' files to:'
-print ' ' + outFileName
+print('Wrote ' + str(fileCount) + ' files to:')
+print(' ' + outFileName)
     

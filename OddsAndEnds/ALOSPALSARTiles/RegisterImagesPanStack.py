@@ -73,8 +73,8 @@ class BatchRunCommand (object):
         import subprocess
         out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         (stdout, stderr) = out.communicate()
-        print stdout
-        print stderr
+        print(stdout)
+        print(stderr)
 
     def run(self, inDIR):
     

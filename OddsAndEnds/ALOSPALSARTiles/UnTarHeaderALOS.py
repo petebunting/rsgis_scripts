@@ -29,7 +29,7 @@ class BatchRunCommand (object):
 
     def unTar(self, inDIR, fileName):
         if os.path.isdir(os.path.join(inDIR,fileName)):
-            print(' Skipping ' + os.path.join(inDIR,fileName) + '.tar.gz')
+            print((' Skipping ' + os.path.join(inDIR,fileName) + '.tar.gz'))
             return 0
         else:
             mkdirCommand = 'mkdir ' + inDIR + '/' + fileName

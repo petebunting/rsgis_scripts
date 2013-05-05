@@ -14,10 +14,10 @@ import numpy as np
 import csv
 
 if len(sys.argv) != 4:
-    print '''Not enough parameters provided.
+    print('''Not enough parameters provided.
 Usage:
     python addFloatCoords2TiePoints.py inImageFile inTiePointFile.csv outTiePointFile.csv
-'''
+''')
     exit()
 
 inImageFile = sys.argv[1]
@@ -42,7 +42,7 @@ minY = maxY + (ySize * pixSizeY)
 try:
     inGCPs = np.genfromtxt(inGCPFile, delimiter=',', comments='#')
 except IOError:
-    print 'ERROR: In text file contains no points!'
+    print('ERROR: In text file contains no points!')
     exit()
 
 try:
@@ -74,8 +74,8 @@ try:
     rmseX = np.sqrt(np.average(sqDiffX))
     rmseY = np.sqrt(np.average(sqDiffY))
     
-    print 'RMSE (map units): x', rmseX, ', y', rmseY
-    print 'RMSE (pixels): x', rmseX / pixSizeX, ', y', rmseY / np.abs(pixSizeY)
+    print('RMSE (map units): x', rmseX, ', y', rmseY)
+    print('RMSE (pixels): x', rmseX / pixSizeX, ', y', rmseY / np.abs(pixSizeY))
     
     # Write data out to CSV file
     outGCPs = csv.writer(open(outGCPFile,'w'))
@@ -86,6 +86,6 @@ try:
         outGCPs.writerow([inGCPs[i,0],inGCPs[i,1],floatXCoords[i], floatYCoords[i], diffX[i], diffY[i], diffXPix[i],diffYPix[i], powerDiffPix[i], phaseDiffPix[i]])
 
 except IndexError:
-    print 'ERROR: Not enough columns in infile'
+    print('ERROR: Not enough columns in infile')
 
 
