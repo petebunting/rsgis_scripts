@@ -23,7 +23,6 @@ input string'''
         self.replaceString = replaceString
     
     def frReplace(self, inString):
-        #outString = re.sub(self.findString, self.replaceString, inString)
         outString = inString.replace(self.findString, self.replaceString)
         return outString
         
@@ -69,6 +68,8 @@ class FindReplaceTextDIR (object):
             if count == 1:
                 elements = line.split('#', count)
                 findReplaceList.append(findReplaceObj(elements[0], re.sub('\n','',elements[1])))
+            else:
+                print("WARNING: Invalid find and replace format.\nFind and replace strings must be seperated by '#'")
         inFile.close()
     
     def findReplaceTextFile(self, inFileName, findReplaceList):
@@ -86,7 +87,7 @@ class FindReplaceTextDIR (object):
             outFileString = fritem.frReplace(outFileString)
         
         if outFileString != inFileString:
-            print("Replacing text in: ", inFileName)
+            print("Replacing text in: " + inFileName)
             # Write out file (if something has changed)
             outFile = open(inFileName, 'w')
             outFile.write(outFileString)
