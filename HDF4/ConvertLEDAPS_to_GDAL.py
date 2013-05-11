@@ -15,6 +15,7 @@ import numpy
 from osgeo import gdal
 # Import the GDAL/OGR spatial reference library
 from osgeo import osr
+from osgeo import ogr
 # Import the HDF4 reader.
 import pyhdf.SD
 # Import the system library
@@ -275,6 +276,10 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     attr = hdfImg.attributes(full=1)
     #print attr
     
+    print "Reading WKT file:"
+    wktStr = readTextFile(wktFile)
+    print wktStr
+    
     headerParams = dict()
     
     headerParams['AcquisitionDate'] = attr['AcquisitionDate'][0]
@@ -283,6 +288,13 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     headerParams['SolarZenith'] = attr['SolarZenith'][0]
     headerParams['OrientationAngle'] = attr['OrientationAngle'][0]
     headerParams['PixelSize'] = attr['PixelSize'][0]
+    
+    headerParams['WestBoundingCoordinate'] = attr['WestBoundingCoordinate'][0]
+    headerParams['EastBoundingCoordinate'] = attr['EastBoundingCoordinate'][0]
+    headerParams['NorthBoundingCoordinate'] = attr['NorthBoundingCoordinate'][0]
+    headerParams['SouthBoundingCoordinate'] = attr['SouthBoundingCoordinate'][0]
+    
+    #print headerParams
     
     tlCoords = findElement(attr['StructMetadata.0'][0], 'UpperLeftPointMtrs')
     
@@ -297,7 +309,22 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     
     headerParams['SizeX'] = findElement(attr['StructMetadata.0'][0], 'XDim')
     headerParams['SizeY'] = findElement(attr['StructMetadata.0'][0], 'YDim')
+
+    wgs84Proj = osr.SpatialReference()
+    wgs84Proj.ImportFromEPSG(4326)
     
+    inWKTProj = osr.SpatialReference()
+    inWKTProj.ImportFromWkt(wktStr)
+    
+    wktPt = 'POINT(%s %s)' % (headerParams['WestBoundingCoordinate'], headerParams['NorthBoundingCoordinate'])
+    print(wktPt)
+    point = ogr.CreateGeometryFromWkt(wktPt)
+    point.AssignSpatialReference(wgs84Proj)
+    point.TransformTo(inWKTProj)
+    print(point)
+    
+    headerParams['TLX'] = point.GetX()
+    headerParams['TLY'] = point.GetY()
     
     print "BandNumbers = ", attr['BandNumbers'][0]
     print "AcquisitionDate = ", headerParams['AcquisitionDate']
@@ -311,12 +338,10 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     print "SizeX = ", headerParams['SizeX'] 
     print "SizeY = ", headerParams['SizeY']
     
-    
-    #print "StructMetadata.0 = ", attr['StructMetadata.0'][0]
-    
-    print "Reading WKT file:"
-    wktStr = readTextFile(wktFile)
-    print wktStr
+    print "WestBoundingCoordinate = ", headerParams['WestBoundingCoordinate'] 
+    print "EastBoundingCoordinate = ", headerParams['EastBoundingCoordinate']
+    print "NorthBoundingCoordinate = ", headerParams['NorthBoundingCoordinate'] 
+    print "SouthBoundingCoordinate = ", headerParams['SouthBoundingCoordinate']
     
     
     if not outputReflFile == None:
