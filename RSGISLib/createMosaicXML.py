@@ -88,6 +88,7 @@ outXML = '''<?xml version="1.0" encoding="UTF-8" ?>
 
 <rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
 
+    <!-- Create Mosaic -->
     <rsgis:command algor="imageutils" option="mosaic" 
      output="%s"
      format="%s" datatype="%s" proj="IMAGE" 
@@ -106,7 +107,13 @@ for file in fileList:
     outXML = outXML+'''\t\t<rsgis:image file="%s" />\n'''%(file)
     fileCount+=1
 
-outXML=outXML+'\t</rsgis:command>\n</rsgis:commands>\n'
+outXML=outXML+'''
+    </rsgis:command>
+    
+    <!-- Calculate stats and generate pyramids (for faster display)
+    <rsgis:command algor="imageutils" option="popimgstats" image="%s" ignore="0" pyramids="yes" />
+
+</rsgis:commands>'''%(args.outmosaic)
 
 outXMLFile.write(outXML)
 
@@ -114,7 +121,7 @@ outXMLFile.write(outXML)
 outXMLFile.close()
 
 print('Found %i files'%fileCount)
-print('Run mosaic using:\n\trsgisexe -x ' + args.outmosaic)
+print('Run mosaic using:\n\trsgisexe -x ' + args.xml)
 
 
 
