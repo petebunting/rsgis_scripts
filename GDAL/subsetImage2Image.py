@@ -23,6 +23,8 @@ def getGDALFormat(fileName):
         gdalStr = 'GTiff'
     elif extension == '.img':
         gdalStr = 'HFA'
+    elif extension == '.pix':
+        gdalStr = 'PCIDSK'
     else:
         raise Exception('Type not recognised')
     
