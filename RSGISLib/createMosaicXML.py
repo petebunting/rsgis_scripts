@@ -110,7 +110,7 @@ for file in fileList:
 outXML=outXML+'''
     </rsgis:command>
     
-    <!-- Calculate stats and generate pyramids (for faster display)
+    <!-- Calculate stats and generate pyramids (for faster display) -->
     <rsgis:command algor="imageutils" option="popimgstats" image="%s" ignore="0" pyramids="yes" />
 
 </rsgis:commands>'''%(args.outmosaic)
