@@ -30,21 +30,31 @@ def getGDALFormat(fileName):
     
     return gdalStr
 
-if len(sys.argv) != 4:
-    print ''' The correct number of parameters was not provided.
+if len(sys.argv) < 4:
+    print(''' The correct number of parameters was not provided.
 == subsetImage2Image.py ==
 
 Subsets and reprojects an image (inImage) to the same size and
 projection of a base image (baseImage).
 
 Usage:
-    python subsetImage2Image.py baseImage inImage outImage
-'''
+    python subsetImage2Image.py baseImage inImage outImage [-print]
+
+-print : Don't run, only print gdal_translate options.
+
+''')
     exit()
 
 inBaseFile = sys.argv[1]
 inLargeImage = sys.argv[2]
 outSubsetImage = sys.argv[3]
+
+dummyRun = False
+
+if len(sys.argv) == 5:
+    if sys.argv[4] == '-print':
+        dummyRun = True
+
 
 # Get output format from name
 outGDALFormat = getGDALFormat(outSubsetImage)
@@ -74,5 +84,8 @@ additionalOptions = ' ' # Additional options
 warpOptions = ofStr + bbStr + resStr + projectionStr + overwriteStr + additionalOptions
 
 warpCMD = 'gdalwarp ' + warpOptions + inLargeImage + ' ' + outSubsetImage
-os.system(warpCMD)
+if dummyRun:
+    print(warpCMD)
+else:
+    os.system(warpCMD)
 
