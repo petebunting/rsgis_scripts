@@ -24,12 +24,13 @@ try:
 except ImportError:
     usePP = False
 
-class BatchRunCommand (object):
+class GenTiePoints (object):
 
     def __init__(self, inDIR, outDIR, inRefImage, ext):
-        self.inDIR = inDIR
-        self.outDIR = outDIR
-        self.inRefImage = inRefImage
+        # Use absolute path to directories
+        self.inDIR = os.path.abspath(inDIR)
+        self.outDIR = os.path.abspath(outDIR)
+        self.inRefImage = os.path.abspath(inRefImage)
         self.ext = ext
         self.scriptsPath = os.sys.path[0]
 
@@ -54,7 +55,7 @@ class BatchRunCommand (object):
 <rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
 
     <!-- Generate GCPs -->
-    <rsgis:command algor="registration" option="singlelayer" reference="%s" floating="%s" output="%s" outputType="rsgis_img2map" metric="correlation" pixelgap="250" window="250" search="5" threshold="0.4" stddevRef="2" stddevFloat="2" subpixelresolution="4" distanceThreshold="500" maxiterations="5" movementThreshold="0.5" pSmoothness="2" />
+    <rsgis:command algor="registration" option="basic" reference="%s" floating="%s" output="%s" outputType="rsgis_img2map" metric="correlation" pixelgap="250" window="250" search="5" threshold="0.4" stddevRef="2" stddevFloat="2" subpixelresolution="4" />
 
     <rsgis:command algor="commandline" option="execute" command="python %s/addFloatCoords2TiePoints.py %s %s %s" >
 
@@ -127,5 +128,5 @@ if __name__ == '__main__':
         exit()
     
 
-    obj = BatchRunCommand(args.indir, args.outdir, args.refimage, args.ext)
+    obj = GenTiePoints(args.indir, args.outdir, args.refimage, args.ext)
     obj.run(args.genXMLOnly)

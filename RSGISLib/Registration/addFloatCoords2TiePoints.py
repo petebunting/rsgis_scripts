@@ -47,8 +47,9 @@ except IOError:
 
 try:
     # Get coordinates from float image based on pixel in tie point file
-    floatXCoords = minX + (inGCPs[:,2] * pixSizeX) 
-    floatYCoords = maxY + (inGCPs[:,3] * pixSizeY) 
+    # Coordinates start at zero
+    floatXCoords = minX + ((inGCPs[:,2]-1) * pixSizeX) 
+    floatYCoords = maxY + ((inGCPs[:,3]-1) * pixSizeY) 
     
     # Calculate differences between base image coordinates (stored in tie point file)
     # and coordinates in floating image.
@@ -57,7 +58,7 @@ try:
     
     # Express difference in pixels
     diffXPix = diffX / pixSizeX
-    diffYPix = diffY / pixSizeY
+    diffYPix = diffY / pixSizeY 
     
     # Calculate aplitude and phase (for plottong)
     phaseDiffPix = np.arctan(abs(diffYPix) / abs(diffXPix)) * 180. / np.pi
@@ -74,8 +75,8 @@ try:
     rmseX = np.sqrt(np.average(sqDiffX))
     rmseY = np.sqrt(np.average(sqDiffY))
     
-    print('RMSE (map units): x', rmseX, ', y', rmseY)
-    print('RMSE (pixels): x', rmseX / pixSizeX, ', y', rmseY / np.abs(pixSizeY))
+    print('RMSE (map units): x ' + str(rmseX) + ', y ' +str(rmseY))
+    print('RMSE (pixels): x ' + str(rmseX / pixSizeX) + ', y ' + str(rmseY / np.abs(pixSizeY)))
     
     # Write data out to CSV file
     outGCPs = csv.writer(open(outGCPFile,'w'))
