@@ -2,7 +2,7 @@
 #############################################
 # A script to recursivly find files with a given search
 # string and create an XML file to mosaic, for execution 
-# in RGISLib
+# in RGISLib.
 #
 # Dan Clewley (clewley@usc.edu) 24/05/2013
 # 
