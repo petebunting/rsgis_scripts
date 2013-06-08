@@ -96,7 +96,8 @@ outXML = '''<?xml version="1.0" encoding="UTF-8" ?>
 '''%(user,timeStr,args.outmosaic,outFormat, args.datatype)
 
 # Recursively find all files in the input directory using specified search string
-command='find ' + args.indir + ' -name ' + args.search
+command='find ' + args.indir + ' -name \'' + args.search + '\''
+print(command)
 out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 (stdout, stderr) = out.communicate()
 fileList = stdout.decode(encoding).split()
