@@ -55,7 +55,7 @@ try:
     # and coordinates in floating image.
     diffX = floatXCoords - inGCPs[:,0]
     diffY = floatYCoords - inGCPs[:,1]
-    
+
     # Express difference in pixels
     diffXPix = diffX / pixSizeX
     diffYPix = diffY / pixSizeY 
@@ -81,10 +81,10 @@ try:
     # Write data out to CSV file
     outGCPs = csv.writer(open(outGCPFile,'w'))
     
-    outGCPs.writerow(['baseE','baseN','floatE','floatN','diffE','diffN','diffXPix','diffYPix','powerPixDiff','phasePixDiff'])
+    outGCPs.writerow(['baseE','baseN','floatE','floatN','diffE','diffN','diffXPix','diffYPix','powerPixDiff','phasePixDiff','Correlation'])
     
     for i in range(inGCPs.shape[0]):
-        outGCPs.writerow([inGCPs[i,0],inGCPs[i,1],floatXCoords[i], floatYCoords[i], diffX[i], diffY[i], diffXPix[i],diffYPix[i], powerDiffPix[i], phaseDiffPix[i]])
+        outGCPs.writerow([inGCPs[i,0],inGCPs[i,1],floatXCoords[i], floatYCoords[i], diffX[i], diffY[i], diffXPix[i],diffYPix[i], powerDiffPix[i], phaseDiffPix[i],inGCPs[i,4]])
 
 except IndexError:
     print('ERROR: Not enough columns in infile')

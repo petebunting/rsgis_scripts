@@ -15,6 +15,7 @@
 #######################################
 
 import os, sys, argparse, subprocess, re, glob
+from time import strftime
 
 # Check if pp is on the system for running in parallel.
 usePP = True
@@ -39,17 +40,20 @@ class GenTiePoints (object):
         inBaseFileName = re.sub('\.' + self.ext,'',fileName)
         inFile = os.path.join(self.inDIR, fileName)
         outGCPFile = os.path.join(self.outDIR, inBaseFileName) + '_gcp.txt'
-        outGCPDiffFile = os.path.join(self.outDIR, inBaseFileName) + '_gcp_diffs.txt'
+        outGCPDiffFile = os.path.join(self.outDIR, inBaseFileName) + '_gcp_diffs.csv'
         inXMLFile = os.path.join(self.outDIR, inBaseFileName) + '_genTiePoints.xml'
         xmlFileList.append(inXMLFile)
         inXML = open(inXMLFile, 'w')
-   
+
+        # Get time
+        timeStr = strftime('%a %b %m %H:%M:%S %Y.')
+
         xmlText = '''<?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Description:
        XML File for execution within RSGISLib
-       Created by Daniel Clewley on Sat March 9 20:39:21 2013.
-       Copyright (c) 2012 Aberystwyth University. All rights reserved.
+       Created by Daniel Clewley on %s.
+       Copyright (c) 2013 Daniel Clewley. All rights reserved.
 -->
 
 <rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
@@ -57,9 +61,10 @@ class GenTiePoints (object):
     <!-- Generate GCPs -->
     <rsgis:command algor="registration" option="basic" reference="%s" floating="%s" output="%s" outputType="rsgis_img2map" metric="correlation" pixelgap="250" window="250" search="5" threshold="0.4" stddevRef="2" stddevFloat="2" subpixelresolution="4" />
 
+    <!-- Create differences CSV -->
     <rsgis:command algor="commandline" option="execute" command="python %s/addFloatCoords2TiePoints.py %s %s %s" >
 
-</rsgis:commands>'''%(self.inRefImage, inFile, outGCPFile, self.scriptsPath, inFile, outGCPFile, outGCPDiffFile)
+</rsgis:commands>'''%(timeStr, self.inRefImage, inFile, outGCPFile, self.scriptsPath, inFile, outGCPFile, outGCPDiffFile)
 
         inXML.write(xmlText)
         inXML.close()
