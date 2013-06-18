@@ -17,10 +17,10 @@ if len(sys.argv) == 3:
     inImage = sys.argv[1]
     outImage = sys.argv[2] 
 else:
-    print '''Not enough parameters provided.
+    print('''Not enough parameters provided.
 Usage:
    convert2dB.py inImage outImage
-        '''
+        ''')
     exit()
 
 infiles = applier.FilenameAssociations()
