@@ -116,7 +116,9 @@ Calling without a script file will print out the 'PROCESSING_HISTORY' key'''
         scriptFile = open(args.file,'rU')
 
         for line in scriptFile:
-            scriptText = scriptText + line + '\n'
+            scriptText = scriptText + line
+
+        scriptText = scriptText + '# END ' + os.path.split(args.file)[-1] + ":\n"
 
         # Set metadata
         setMetadata(args.input, scriptMetadataKey, scriptText)
