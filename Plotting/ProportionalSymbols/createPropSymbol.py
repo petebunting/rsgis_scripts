@@ -65,7 +65,7 @@ def createSMSymbol(outDIR, outSymbolName, val1, val2, val3):
     
     # Sort sensors symbols according to soil moisture. 3 - largest, 1 smallest
     sensorDict = {sensor1File: val1, sensor2File: val2,sensor3File: val3}
-    sortedFiles = sorted(sensorDict.iteritems(), key=lambda (k,v): (v,k))
+    sortedFiles = sorted(iter(sensorDict.items()), key=lambda k_v: (k_v[1],k_v[0]))
     
     symbol3 = sortedFiles[2][0]
     symbol2 = sortedFiles[1][0]
@@ -83,10 +83,10 @@ def createSMSymbol(outDIR, outSymbolName, val1, val2, val3):
         os.remove(tfile)
 
 if len(sys.argv) < 6:
-    print '''Not enough parameters provided.
+    print('''Not enough parameters provided.
 Usage:
    python createPropSymbol.py outDIR outSymbolName.png Val1 (yellow) Val2 (orange) Val3 (red)
-'''
+''')
     exit()
 else:
     outDIR = sys.argv[1]
