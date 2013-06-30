@@ -54,7 +54,7 @@ for layer in range(numLayers):
     layerName = inputLayers[layer]
    
     outFileName = re.sub('\.h5','',inHDF5File) + '_' +layerName + '_kea.kea'
-    print 'Saving ' + str(layer+1) + '/' + str(numLayers) + ': ' + layerName + ' to: ' + outFileName
+    print('Saving ' + str(layer+1) + '/' + str(numLayers) + ': ' + layerName + ' to: ' + outFileName)
 
     numBands = len(soildata[layerName][0][0])
     

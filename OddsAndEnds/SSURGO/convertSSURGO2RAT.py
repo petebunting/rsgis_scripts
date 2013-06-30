@@ -36,14 +36,14 @@ elif len(sys.argv) >= 4:
     outColName = sys.argv[2] 
     outRes = str(sys.argv[4])
 else:
-    print '''Create Raster Atttribute Table (RAT) in KEA format from SSURGO data.
+    print('''Create Raster Atttribute Table (RAT) in KEA format from SSURGO data.
 If the KEA file exists, new attributes are appended to the RAT.
 
 Usage:
     python convertSSURGO2RAT.py inBaseDIR outColName [outRes]
 Where outColName and outColNum are the required attributes in the table 'chorizon'
 The output resolution defaults to 30, assuming the input projection is in m.
-'''
+''')
     exit()
 
 # Import dictionary of values
@@ -66,12 +66,12 @@ outRasterImageScript = outRasterImageScript.replace('.env','.xml')
 # Check if KEA file exists or needs creating - assume if it exists it has the attribute table already
 if os.path.exists(outKEAFile) == False: 
     # Rasterize polygon using gdal
-    print 'Creating raster'
+    print('Creating raster')
     rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr ' + outRes + ' ' + outRes + ' -a MUKEY ' + inSHPFile + ' ' + outKEAFile + ' > /dev/null'
-    print rasterizeCommand
+    print(rasterizeCommand)
     os.system(rasterizeCommand)
     
-    print 'Converting to RAT'
+    print('Converting to RAT')
     # Convert to RAT using RSGIS
     outRSGISText = '''<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
         <rsgis:command algor="rastergis" option="popattributestats" clumps="%s" input="%s" >
@@ -90,7 +90,7 @@ if os.path.exists(outKEAFile) == False:
     os.remove(outXMLName)
 
 # JOIN ATTRIBUTES FROM TEXT FILE
-print 'Adding ' + outColName + ' (column ' + str(outColNum) + ') to RAT'
+print('Adding ' + outColName + ' (column ' + str(outColNum) + ') to RAT')
 # Open SSURGO text files
 componentFileName = os.path.join(inDIRName, 'tabular','comp.txt')
 chorizonFileName = os.path.join(inDIRName, 'tabular','chorizon.txt')
@@ -166,10 +166,10 @@ outXMLFile = open(outRasterImageScript, 'w')
 outXMLFile.write(outRSGISText)
 outXMLFile.close()
 
-print 'Finished.'
-print 'If you have viewer installed, you can view the data using:'
-print ' viewer ' + outKEAFile
-print 'To create a standard raster, with a seperate band for each layer, run:'
-print ' rsgisexe -x ' + outRasterImageScript
+print('Finished.')
+print('If you have viewer installed, you can view the data using:')
+print(' viewer ' + outKEAFile)
+print('To create a standard raster, with a seperate band for each layer, run:')
+print(' rsgisexe -x ' + outRasterImageScript)
 
 
