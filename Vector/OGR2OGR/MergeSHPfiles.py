@@ -3,10 +3,19 @@
 #######################################
 # MergeSHPfiles.py
 # A python script to merge shapefiles
-# Author: <YOUR NAME>
-# Email: <YOUR EMAIL>
-# Date: DD/MM/YYYY
+# Author: Pete Bunting
+# Email: pfb@aber.ac.uk
+# Date: 2007
 # Version: 1.0
+#
+# Version: 1.1
+#   Modified to recursively search for files
+#   Dan Clewley
+#
+# Version: 1.2
+#   Extension to search optionally passed in
+#   (Can merge any OGR vector)
+#   Dan Clewley (30/06/2013)
 #######################################
 
 import os
@@ -95,11 +104,10 @@ class MergeSHPfiles (object):
             print(directory + ' does not exist!')
 
     # A function to control the merging of shapefiles
-    def mergeSHPfiles(self, filePath, newSHPfile):
-        # Get the list of files within the directory
-        # provided with the extension .shp
+    def mergeSHPfiles(self, filePath, newSHPfile, searchExtension='.shp'):
+        # Get the list of files within the directory with given extension
        fileList = list()
-       self.findFilesExt(filePath, '.shp', fileList)
+       self.findFilesExt(filePath, searchExtension, fileList)
        # Variable used to identify the first file
        first = True
        # Format string for outFile
@@ -131,12 +139,18 @@ class MergeSHPfiles (object):
         # and output base).
         # Note that argument 0 (i.e., sys.argv[0]) is the name
         # of the script uncurrently running.
-        if numArgs == 3:
+        if numArgs >= 3:
             # Retrieve the input directory
             filePath = sys.argv[1]
             # Retrieve the output file
             newSHPfile = sys.argv[2]
             
+            searchExtension='.shp'
+            if numArgs == 4:
+                searchExtension = sys.argv[3].strip()
+                # Check if dot was provided before extension - add if not
+                if searchExtension.find('.') < 0:
+                    searchExtension = '.' + searchExtension
             # Check input file path exists and is a directory
             if not os.path.exists(filePath):
                 print('Filepath does not exist')
@@ -144,10 +158,10 @@ class MergeSHPfiles (object):
                 print('Filepath is not a directory!')
             else:
                 # Merge the shapefiles within the filePath
-                self.mergeSHPfiles(filePath, newSHPfile)
+                self.mergeSHPfiles(filePath, newSHPfile, searchExtension)
         else:
             print("ERROR. Command should have the form:")
-            print("python MergeSHPfiles_cmd.py <Input File Path> <Output File>")
+            print("python MergeSHPfiles_cmd.py <Input File Path> <Output File> [extension - default '.shp']")
 
 # The start of the code
 if __name__ == '__main__':
