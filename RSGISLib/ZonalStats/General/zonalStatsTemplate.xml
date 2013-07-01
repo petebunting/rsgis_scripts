@@ -1,0 +1,10 @@
+
+    <rsgis:command algor="zonalstats" option="pixelstats" 
+    image="$PATH/$FILENAME1.kea" 
+    vector="$FILEPATH1" 
+    outputCSV="$PATH/ZonalStats/$FILENAME1_stats.csv" 
+    force="yes"
+    mean="yes"
+    method="pixelContainsPolyCenter"
+    ignoreProjection="no"/>
+
