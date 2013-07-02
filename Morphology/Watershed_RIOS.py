@@ -36,4 +36,4 @@ for (info, blocks) in reader:
     print info.getPercent(), '%\r',
 print '100%\r',
 
-writer.close(calcStats=True)
+writer.close(calcStats=False)

@@ -1,0 +1,7 @@
+    <rsgis:command algor="imagecalc" option="bandmaths" output="$PATH/KEA/$FILENAME_MASK.kea" format="KEA" datatype="Byte" expression="(b1==0)?0:1" >
+        <rsgis:variable name="b1" image="$FILEPATH" band="1" />
+    </rsgis:command>
+    
+    <rsgis:command algor="rastergis" option="populatestats" clumps="$PATH/KEA/$FILENAME_MASK.kea" pyramids="yes" colourtable="yes" />
+    
+    <rsgis:command algor="commandline" option="execute" command="gdal_polygonize.py -mask $PATH/KEA/$FILENAME_MASK.kea $PATH/KEA/$FILENAME_MASK.kea -b 1 -f 'ESRI Shapefile' $PATH/SHP/$FILENAME_Footprint.shp $FILENAME_Footprint" />
