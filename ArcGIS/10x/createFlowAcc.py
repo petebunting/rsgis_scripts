@@ -7,7 +7,6 @@
 
 # Import arcpy module
 import os, sys
-sys.path.append("C:/Program Files/ArcGIS/Desktop10.1/Python/arcpy")
 import arcpy
 
 # Check out any necessary licenses
