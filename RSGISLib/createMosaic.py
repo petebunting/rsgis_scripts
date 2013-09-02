@@ -88,7 +88,6 @@ outFormat=getGDALFormat(args.outmosaic)
 
 # Recursively find all files in the input directory using specified search string
 command='find ' + args.indir + ' -name \'' + args.search + '\''
-print(command)
 out = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 (stdout, stderr) = out.communicate()
 # Check which python version we're using
@@ -101,8 +100,10 @@ fileCount=len(fileList)
 
 print('Found %i files'%fileCount)
 
+print('Creating mosaic...')
 imageutils.createImageMosaic(fileList, args.outmosaic, 0, 0, 1, 0, outFormat, getRSGISLibDataType(args.datatype))
 # Create pyramids
+print('Calculating stats and pyramids...')
 imageutils.popImageStats(args.outmosaic,True,0.,True)
-
+print('Finished')
 

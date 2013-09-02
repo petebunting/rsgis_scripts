@@ -7,7 +7,6 @@
 
 # Import arcpy module
 import os, sys, glob
-sys.path.append("C:/Program Files/ArcGIS/Desktop10.1/Python/arcpy")
 import arcpy
 from arcpy import env
 

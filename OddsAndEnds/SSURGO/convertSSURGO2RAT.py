@@ -167,8 +167,8 @@ outXMLFile.write(outRSGISText)
 outXMLFile.close()
 
 print('Finished.')
-print('If you have viewer installed, you can view the data using:')
-print(' viewer ' + outKEAFile)
+print('If you have tuiview installed, you can view the data using:')
+print(' tuiview ' + outKEAFile)
 print('To create a standard raster, with a seperate band for each layer, run:')
 print(' rsgisexe -x ' + outRasterImageScript)
 
