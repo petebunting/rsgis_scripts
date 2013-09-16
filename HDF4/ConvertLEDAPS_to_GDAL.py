@@ -281,7 +281,7 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     print wktStr
     
     headerParams = dict()
-    
+        
     headerParams['AcquisitionDate'] = attr['AcquisitionDate'][0]
     headerParams['WRS_Row'] = attr['WRS_Row'][0]
     headerParams['SolarAzimuth'] = attr['SolarAzimuth'][0]
@@ -310,23 +310,23 @@ def run(inputFile, outputReflFile, outputThermalFile, outputFileAtmos, outputFil
     headerParams['SizeX'] = findElement(attr['StructMetadata.0'][0], 'XDim')
     headerParams['SizeY'] = findElement(attr['StructMetadata.0'][0], 'YDim')
 
-    wgs84Proj = osr.SpatialReference()
-    wgs84Proj.ImportFromEPSG(4326)
+    #wgs84Proj = osr.SpatialReference()
+    #wgs84Proj.ImportFromEPSG(4326)
     
-    inWKTProj = osr.SpatialReference()
-    inWKTProj.ImportFromWkt(wktStr)
+    #inWKTProj = osr.SpatialReference()
+    #inWKTProj.ImportFromWkt(wktStr)
     
-    wktPt = 'POINT(%s %s)' % (headerParams['WestBoundingCoordinate'], headerParams['NorthBoundingCoordinate'])
-    print(wktPt)
-    point = ogr.CreateGeometryFromWkt(wktPt)
-    point.AssignSpatialReference(wgs84Proj)
-    point.TransformTo(inWKTProj)
-    print(point)
+    #wktPt = 'POINT(%s %s)' % (headerParams['WestBoundingCoordinate'], headerParams['NorthBoundingCoordinate'])
+    #print(wktPt)
+    #point = ogr.CreateGeometryFromWkt(wktPt)
+    #point.AssignSpatialReference(wgs84Proj)
+    #point.TransformTo(inWKTProj)
+    #print(point)
     
-    headerParams['TLX'] = point.GetX()
-    headerParams['TLY'] = point.GetY()
+    #headerParams['TLX'] = point.GetX()
+    #headerParams['TLY'] = point.GetY()
     
-    print "BandNumbers = ", attr['BandNumbers'][0]
+    #print "BandNumbers = ", attr['BandNumbers'][0]
     print "AcquisitionDate = ", headerParams['AcquisitionDate']
     print "WRS_Row = ", headerParams['WRS_Row'] 
     print "SolarAzimuth = ", headerParams['SolarAzimuth']
