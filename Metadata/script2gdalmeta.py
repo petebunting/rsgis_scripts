@@ -20,6 +20,8 @@ def getMetadataKeyFilename(fileName):
         metadataKey = 'PROCESSING_RSGISLIB_XML_SCRIPT' 
     elif extension == '.py': # Python
         metadataKey = 'PROCESSING_PYTHON_SCRIPT'
+    elif extension == '.r' or extension == '.R': # 
+        metadataKey = 'PROCESSING_R_SCRIPT'
     return metadataKey
 
 def setMetadata(inputFile, metadataKey, metadataText):
@@ -79,6 +81,8 @@ RSGISLib XML scripts are added / appended to the key:
     PROCESSING_RSGISLIB_XML_SCRIPT
 Python Scripts are added / appended to the key:
     PROCESSING_PYTHON_SCRIPT
+R Scripts are added / appended to the key:
+    PROCESSING_R_SCRIPT
 All other scripts are added / appended to the key:
     PROCESSING_HISTORY
 
