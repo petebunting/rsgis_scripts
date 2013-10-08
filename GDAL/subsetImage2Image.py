@@ -83,7 +83,7 @@ overwriteStr = ' -overwrite ' # Overwrite output if it exists
 additionalOptions = ' ' # Additional options
 warpOptions = ofStr + bbStr + resStr + projectionStr + overwriteStr + additionalOptions
 
-warpCMD = 'gdalwarp ' + warpOptions + inLargeImage + ' ' + outSubsetImage
+warpCMD = 'gdalwarp ' + warpOptions + '"' + inLargeImage + '" "' + outSubsetImage + '"'
 if dummyRun:
     print(warpCMD)
 else:
