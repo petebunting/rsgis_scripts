@@ -2,8 +2,17 @@
 # Provides similar functionality to RSGISLib CalcImage class / RIOS applier 
 # in R.
 # Executes function, operating on R data frames for all pixels in image.
+#
 # Dan Clewley (clewley@usc.edu)
 # 26/09/2013
+#
+# This script is made available under the terms of the GNU General Public License 
+# as published by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The functions are based on RSGISCalcImage.cpp from RSGISLib
+# created by Pete Bunting and Copyright 2013 RSGISLib.
+#
 
 library(rgdal)
 
