@@ -21,11 +21,11 @@ except ImportError:
 
 # Set up options
 parser = argparse.ArgumentParser()
-parser.add_argument("--inimage", type=str, help="Input image.")
+parser.add_argument("--inimage", type=str, help="Input image.", required=True)
 parser.add_argument("--invector", type=str, \
-    help="Input Shapefile containing regions of interest.")
+    help="Input Shapefile containing regions of interest.", required=True)
 parser.add_argument("--outstats", type=str, \
-    help="Output Shapefile / CSV file with statistics.")
+    help="Output Shapefile / CSV file with statistics.", required=True)
 parser.add_argument("--force", dest='force', default=False, action='store_true', \
     help="Force removal of output shapefile if it exists.")
 parser.add_argument("--noprojwarnings", dest='noprojwarnings', default=False, \
@@ -39,27 +39,13 @@ parser.add_argument("--stddev", dest='calcStDev', default=False, \
     action='store_true')
 parser.add_argument("--mode", dest='calcMode', default=False, action='store_true')
 parser.add_argument("--sum", dest='calcSum', default=False, action='store_true')
+parser.add_argument("--minThreshold", dest='minThreshold', type=float, default=None)
+parser.add_argument("--maxThreshold", dest='maxThreshold', type=float, default=None)
 args = parser.parse_args() 
 
-# Check we have required input and output files
-if args.inimage == None:
-    print('No input image provided')
-    parser.print_help()
-    sys.exit()
-
-if args.invector == None:
-    print('No input vector provided')
-    parser.print_help()
-    sys.exit()
-
-if args.outstats == None:
-    print('No output shapefile provided')
-    parser.print_help()
-    sys.exit()
-
 # Set up ZonalAttributes object with statistics to calculate
-zonalattributes = zonalstats.ZonalAttributes(minThreshold=None, \
-maxThreshold=None, calcCount=False, calcMin=args.calcMin, \
+zonalattributes = zonalstats.ZonalAttributes(minThreshold=args.minThreshold, \
+maxThreshold=args.maxThreshold, calcCount=False, calcMin=args.calcMin, \
 calcMax=args.calcMax, calcMean=args.calcMean, calcStdDev=args.calcStDev, \
 calcMode=args.calcMode, calcSum=args.calcSum)
 

@@ -101,9 +101,15 @@ fileCount=len(fileList)
 print('Found %i files'%fileCount)
 
 print('Creating mosaic...')
+t = rsgislib.RSGISTime()
+t.start(True)
 imageutils.createImageMosaic(fileList, args.outmosaic, 0, 0, 1, 0, outFormat, getRSGISLibDataType(args.datatype))
+t.end()
+
 # Create pyramids
-print('Calculating stats and pyramids...')
+print('\nCalculating stats and pyramids...')
+t.start(True)
 imageutils.popImageStats(args.outmosaic,True,0.,True)
+t.end()
 print('Finished')
 
