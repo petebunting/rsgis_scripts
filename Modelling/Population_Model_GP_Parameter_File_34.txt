@@ -1,9 +1,9 @@
-numOfYears=20
+numOfYears=50
 initalAdultPairPop=15
 winterSurvivalRate=0.66
 averageEggsPerPair=3.64
 averageFledgelingsPerPair=3.2
-predatorControl=False
+predatorControl=True
 numOfFledgelings=14
 numOfFledgelingsYearOld=8
 fledgelingsSurvivePredatorsCtrl=0.75 
