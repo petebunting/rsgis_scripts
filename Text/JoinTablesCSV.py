@@ -56,7 +56,7 @@ class JoinTables (object):
         matchFeatureList = list()
         matchDataList = list()
         
-        print('Matching column: ', matchSearchFeature, ' with: ',  refSearchFeature, ' in refference data')
+        print('Matching column: %i with: %i in refference data'%(matchSearchFeature, refSearchFeature))
         
         # Read in refference data
         print('Reading in data')
