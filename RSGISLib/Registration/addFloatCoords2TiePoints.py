@@ -67,7 +67,7 @@ try:
     phaseDiffPix = np.where(np.logical_and(diffXPix < 0, diffYPix > 0) ,phaseDiffPix + 90, phaseDiffPix)
     phaseDiffPix = np.where(np.logical_and(diffXPix > 0, diffYPix < 0) ,phaseDiffPix + 270, phaseDiffPix)
         
-    powerDiffPix = np.sqrt(diffXPix**2 + diffYPix**2)
+    ampDiffPix = np.sqrt(diffXPix**2 + diffYPix**2)
     
     sqDiffX = (inGCPs[:,0] - floatXCoords)**2
     sqDiffY = (inGCPs[:,1] - floatYCoords)**2
@@ -81,10 +81,10 @@ try:
     # Write data out to CSV file
     outGCPs = csv.writer(open(outGCPFile,'w'))
     
-    outGCPs.writerow(['baseE','baseN','floatE','floatN','diffE','diffN','diffXPix','diffYPix','powerPixDiff','phasePixDiff','Correlation'])
+    outGCPs.writerow(['baseE','baseN','floatE','floatN','diffE','diffN','diffXPix','diffYPix','powerPixDiff','ampPixDiff','Correlation'])
     
     for i in range(inGCPs.shape[0]):
-        outGCPs.writerow([inGCPs[i,0],inGCPs[i,1],floatXCoords[i], floatYCoords[i], diffX[i], diffY[i], diffXPix[i],diffYPix[i], powerDiffPix[i], phaseDiffPix[i],inGCPs[i,4]])
+        outGCPs.writerow([inGCPs[i,0],inGCPs[i,1],floatXCoords[i], floatYCoords[i], diffX[i], diffY[i], diffXPix[i],diffYPix[i], ampDiffPix[i], phaseDiffPix[i],inGCPs[i,4]])
 
 except IndexError:
     print('ERROR: Not enough columns in infile')
