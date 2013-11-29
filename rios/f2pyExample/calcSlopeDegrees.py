@@ -4,6 +4,9 @@
 #
 # Adapted from EASI code by Jane Whitcomb
 #
+# Updated to use Numba if Fortran module is not available.
+# Runtime is about half the speed.
+#
 
 import sys,os
 from rios import imagereader
@@ -11,14 +14,60 @@ from rios.imagewriter import ImageWriter
 
 import numpy as np
 from math import sqrt
-from scipy import stats
 
 useFortranSlope=True
+
 try:
     import slope
 except ImportError:
     useFortranSlope=False
-    print("Couldn't import fortran slope class - will be about 50 x slower!")
+
+try:
+    from numba import autojit
+    if useFortranSlope:
+        print('Numba is available - using Fortran module instead')
+    else:
+        print('Fortran module not available - using Numba instead')
+except ImportError:
+    if not useFortranSlope:
+        print('Warning: Could not import Numba or Fortran slope module - will be about 50 x slower!')
+    else:
+        print('Fortran module is available')
+    # have to define our own autojit so Python doesn't complain
+    def autojit(func):
+        return func
+
+@autojit
+def slopePython(inBlock, inXSize, inYSize, zScale):
+
+    """ Calculate slope using Python.
+        If Numba is available will make use of autojit function
+        to provide similar speed to Fortran module. if not will fall
+        back to pure Python - which will be slow.
+    """
+    
+    outBlock = np.zeros_like(inBlock, dtype=np.float32)
+
+    for x in range(1,inBlock.shape[2]-1):
+        for y in range(1, inBlock.shape[1]-1):
+            # Get pixel size (offset by one due to overlap)
+            dx = 2 * inXSize[y,x]
+            dy = 2 * inYSize[y,x]
+            # Calculate difference in elevation
+            dzx = (inBlock[0,y,x-1] - inBlock[0,y,x+1])*zScale
+            dzy = (inBlock[0,y-1,x] - inBlock[0,y+1,x])*zScale
+    
+            # Find normal vector to the plane
+            nx = -1 * dy * dzx
+            ny = -1 * dx * dzy
+            nz = dx * dy
+    
+            slopeRad = np.arccos(nz / sqrt(nx**2 + ny**2 + nz**2))
+            slopeDeg = (180. / np.pi) * slopeRad
+    
+            outBlock[0,y,x] = slopeDeg
+   
+    return outBlock
 
 def calcSlope(inBlock, inXSize, inYSize, zScale = 1):
     """ Calculates slope for a block of data
@@ -36,26 +85,7 @@ def calcSlope(inBlock, inXSize, inYSize, zScale = 1):
 
     else:
         # Otherwise run through loop in python (which will be slower)
-        outBlock = np.zeros_like(inBlock, dtype=np.float32)
-
-        for x in range(1,inBlock.shape[2]-1):
-            for y in range(1, inBlock.shape[1]-1):
-                # Get pixel size (offset by one due to overlap)
-                dx = 2 * inXSize[y,x]
-                dy = 2 * inYSize[y,x]
-                # Calculate difference in elevation
-                dzx = (inBlock[0,y,x-1] - inBlock[0,y,x+1])*zScale
-                dzy = (inBlock[0,y-1,x] - inBlock[0,y+1,x])*zScale
-
-                # Find normal vector to the plane
-                nx = -1 * dy * dzx
-                ny = -1 * dx * dzy
-                nz = dx * dy
-
-                slopeRad = np.arccos(nz / sqrt(nx**2 + ny**2 + nz**2))
-                slopeDeg = (180. / np.pi) * slopeRad
-
-                outBlock[0,y,x] = slopeDeg
+        outBlock = slopePython(inBlock, inXSize, inYSize, zScale)
 
     return(outBlock)
 
@@ -78,14 +108,18 @@ def getPixelSize(lat, latsize, lonsize):
 
     return xsize, ysize
     
-if len(sys.argv) != 3:
+if len(sys.argv) < 3:
     print('''ERROR: Not enough parameters provided.
 Usage:
-calcSlopeDegrees.py inImage outImage''')
+calcSlopeDegrees.py inImage outImage [--nostats]''')
     sys.exit()
 
 inImage = sys.argv[1]
 outImage = sys.argv[2]
+
+calcStats = True
+if (len(sys.argv) == 4) and (sys.argv[3] == '--nostats'):
+    calcStats = False
 
 reader = imagereader.ImageReader(inImage, overlap=1)
 
@@ -115,9 +149,12 @@ for (info, inBlock) in reader:
 
 sys.stdout.write("\r 100 Percent Complete\n")
 
-# Close and calculate stats (for faster display)
-print("Writing stats...")
-writer.close(calcStats=True)
+if calcStats:
+    # Close and calculate stats (for faster display)
+    print("Writing stats...")
+    writer.close(calcStats=True)
+else:
+    writer.close(calcStats=False)
 print("Done")
 
 
