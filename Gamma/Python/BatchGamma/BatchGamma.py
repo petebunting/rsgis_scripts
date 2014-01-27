@@ -185,7 +185,7 @@ if srtmSet == False:
     print("ERROR: No DEM provided. Set using 'dem' in parameter file")
     exit()
 if panSet == False:
-    print("WARNING: No panchromatic mosic provided. If required for georefferencing Set using 'pan' in parameter file")
+    print("WARNING: No panchromatic mosaic provided. If required for georefferencing Set using 'pan' in parameter file")
     exit()
 
 #######################################################################################################
@@ -219,8 +219,8 @@ else:
 
 for scene in processScenes:
     print('###########################################################')
-    print((' Processing ' + scene)) 
-    print((' Started processing at: ' +  str(strftime("%H:%M:%S", gmtime()))))
+    print(' Processing ' + scene) 
+    print(' Started processing at: ' +  str(strftime("%H:%M:%S", gmtime())))
     print('###########################################################')
     cpSceneCMD = 'cp ' + inDIR + '/' + scene + '* ' + processDIR
     unTarCMD = 'tar -xf ' + scene + '.tar.gz'
@@ -252,7 +252,7 @@ for scene in processScenes:
         newScene = re.sub('\n','',str(out.readline()))
         sceneDIR = processDIR + '/' + newScene + '/'
         
-        print(('Could not find ' + scene + ' processing, assuming name has changed to: ' + newScene))
+        print('Could not find ' + scene + ' processing, assuming name has changed to: ' + newScene)
         
     if subDIR == False:
         # If no directory called l1data, create one and move all data into it
@@ -265,7 +265,7 @@ for scene in processScenes:
         os.system(mvCMD2)
         os.system(mvCMD3) 
                 
-    print((' Data DIR = ' + dataDIR))
+    print(' Data DIR = ' + dataDIR)
     os.chdir(dataDIR)
     
     # Create temp output files
