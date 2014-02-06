@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Script to colour image with range 0 - 50 %
+# A script to colour an image with range 0 - 50 %
 # using RSGISLib
 # Designed for SM raster images.
 # 
