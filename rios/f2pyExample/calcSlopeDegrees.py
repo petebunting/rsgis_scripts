@@ -1,12 +1,46 @@
-# A script to calculate slope from an image in degres
+#! /usr/bin/env python
+####################################################################################
+# calcSlopeDegrees.py
 #
+# A Python script to calculate slope from a DEM, where the horizontal spacing is in degrees
+# latitude and longitude.
+#
+# Requires RIOS (https://bitbucket.org/chchrsc/rios/) to read image
+#
+# The base slope calculation is in Python. If Numba (http://numba.pydata.org)
+# is available this is used to improve speed.
+# For the best speed a Fortran function (slope.f) is available to perform the slope calculation.
+# This must be compiled using:
+#
+# f2py -c slope.f -m slope
+# 
 # Dan Clewley (daniel.clewley@gmail.com) - 26/06/2013
 #
 # Adapted from EASI code by Jane Whitcomb
 #
-# Updated to use Numba if Fortran module is not available.
-# Runtime is about half the speed.
 #
+# Copyright 2014 Daniel Clewley & Jane Whitcomb.
+# 
+# Permission is hereby granted, free of charge, to any person 
+# obtaining a copy of this software and associated documentation 
+# files (the "Software"), to deal in the Software without restriction, 
+# including without limitation the rights to use, copy, modify, 
+# merge, publish, distribute, sublicense, and/or sell copies of the 
+# Software, and to permit persons to whom the Software is furnished 
+# to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be 
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
+# ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
+# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+####################################################################################
 
 import sys,os
 from rios import imagereader
