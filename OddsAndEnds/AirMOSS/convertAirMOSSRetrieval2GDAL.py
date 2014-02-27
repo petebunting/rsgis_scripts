@@ -61,6 +61,7 @@ def getGDALFormatFromExt(fileName):
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--inimage", type=str, help="Input image",required=True)
 parser.add_argument("-o", "--outimage", type=str, help="Output image", required=True)
+parser.add_argument("-t", "--transpose", action='store_true', default=False, help="Transpose data", required=False)
 args = parser.parse_args() 
 
 
@@ -80,8 +81,12 @@ for i in range(6):
     geoTransform.append(0.0)
 
 # Set image size
-inXSize = np.array(indata['lons']).shape[1]
-inYSize = np.array(indata['lons']).shape[0]
+if args.transpose:
+    inXSize = np.array(indata['lons']).shape[0]
+    inYSize = np.array(indata['lons']).shape[1]
+else:
+    inXSize = np.array(indata['lons']).shape[1]
+    inYSize = np.array(indata['lons']).shape[0]
 
 minLon = indata['lons'][0,0]
 maxLon = indata['lons'][-1,-1]
@@ -120,6 +125,8 @@ for layer in range(numLayers):
     outData = np.array(indata[layerName])
     outData = np.where(outData < -9998,0,outData)
 
+    if args.transpose:
+        outData = outData.transpose()
     # Write out data
     newDataset.GetRasterBand(layer+1).WriteArray(outData)
     
