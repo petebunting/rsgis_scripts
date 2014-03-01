@@ -62,26 +62,24 @@ def getGDALFormat(fileName):
 
 # Get input parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", "--indir", type=str, help="Input directory to recursively search")
-parser.add_argument("-s", "--search", type=str, help="Search string, e.g., '*kea'")
-parser.add_argument("-o", "--outmosaic", type=str, help="Output mosaic file")
+parser.add_argument("-i", "--indir", type=str, required=True, help="Input directory to recursively search")
+parser.add_argument("-s", "--search", type=str, required=True, help="Search string, e.g., '*kea'")
+parser.add_argument("-o", "--outmosaic", type=str, required=True, help="Output mosaic file")
 parser.add_argument("-ot", dest='datatype',type=str, default='Float32',help="Data type")
+parser.add_argument("--backgroundval", dest='datatype',type=float, default=0,help="Background Value (Default 0)")
+parser.add_argument("--skipval", dest='datatype',type=float, default=0,help="Value to be skipped (nodata values) in the input images (Default 0)")
+parser.add_argument("--skipband", dest='datatype',type=int, default=1,help="Band to check for skip val (Default 1)")
+parser.add_argument("--minpix", action='store_true', default=False, help="Use minimum pixel in overlap areas (default, use last in)")
+parser.add_argument("--maxpix", action='store_false',default=False, help="User maximum pixel in overlap areas (default, use last in)")
 args = parser.parse_args()    
 
-if args.indir == None:
-    print('No input directory provided')
-    parser.print_help()
-    exit()
+overlapBehaviour = 0
 
-if args.search == None:
-    print('No search string provided')
-    parser.print_help()
-    exit()
+if args.minpix:
+    overlapBehaviour = 1
 
-if args.outmosaic == None:
-    print('No out mosaic provided')
-    parser.print_help()
-    exit()
+if args.maxpix:
+    overlapBehaviour = 2
 
 # Get output extension from input file
 outFormat=getGDALFormat(args.outmosaic)
@@ -103,7 +101,7 @@ print('Found %i files'%fileCount)
 print('Creating mosaic...')
 t = rsgislib.RSGISTime()
 t.start(True)
-imageutils.createImageMosaic(fileList, args.outmosaic, 0, 0, 1, 0, outFormat, getRSGISLibDataType(args.datatype))
+imageutils.createImageMosaic(fileList, args.outmosaic, args.backgroundval, args.skipval, args.skipband, overlapBehaviour, outFormat, getRSGISLibDataType(args.datatype))
 t.end()
 
 # Create pyramids

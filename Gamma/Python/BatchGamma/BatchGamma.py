@@ -282,7 +282,7 @@ for scene in processScenes:
     alphaEntropyScript = 'genAlphaEntropy.csh'
     geocodeAlphaEntropyScript = 'geoAlphaEntropy.csh'
     
-    print('----------------------------------')
+        print('----------------------------------')
     print('2) Creating GAMMA scripts...')
     # Check processing level of data
     LEDFileList = glob.glob('LED*')
