@@ -100,7 +100,7 @@ pixelY = (minLat - maxLat) / float(inYSize)
 geoTransform[0] = minLon # top left x 
 geoTransform[1] = pixelX
 geoTransform[2] = 0
-geoTransform[3] = maxLat + (pixelY / 2.0)# top left y 
+geoTransform[3] = maxLat # top left y 
 geoTransform[4] = 0
 geoTransform[5] = pixelY
 
