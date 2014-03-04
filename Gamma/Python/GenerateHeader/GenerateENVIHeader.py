@@ -8,14 +8,45 @@
 # Author: Pete Bunting
 # Email: pete.bunting@aber.ac.uk
 # Date: 06/03/2008
-# Version: 1.0
+# Version: 1.1
+#
+# Version 1.1
+# Dan Clewley (11/02/2014)
+# Added option to copy proj from WKT file
+#
 #######################################
 
 import os.path
 import sys
 
+haveGDAL = False
+try:
+    from osgeo import gdal
+    haveGDAL = True
+except ImportError:
+    # Don't worry about this for now. Only a problem
+    # if setting a projection is requested.
+    pass
+
+
 class GenerateENVIHeader (object):
     
+    def addProj(self, outFile, inWKTFileName):
+
+        inWKTFile = open(inWKTFileName,'rU')
+        inWKT = inWKTFile.read()
+        inWKTFile.close()
+
+        # Open the image file, in update mode
+        outputDS = gdal.Open(outFile, gdal.GA_Update)
+
+        # Set projection
+        outputDS.SetProjection(inWKT)
+
+        # Close image
+        outputDS = None
+
+
     def checkFileExtension(self, filename, ext):
         count = filename.count('.')
         elements = filename.split('.',count)
@@ -188,7 +219,7 @@ class GenerateENVIHeader (object):
         else:
             raise BaseException
     
-    def generateENVIHeaderSpatial(self, filelist):
+    def generateENVIHeaderSpatial(self, filelist, wktFile):
         try:
             for filename in filelist:
                 #print filename
@@ -212,16 +243,34 @@ class GenerateENVIHeader (object):
                 outputFile.write( 'byte order = 1\n')
                 outputFile.write( "map info = {%s, 1.500, 1.500, %s, %s, %e, %e, %s, %s, %s, units=meters}\n" % (str(parameters[8]), str(parameters[4]), str(parameters[3]), float(parameters[6]), float(parameters[6]), str(parameters[9]), str(parameters[10]), str(parameters[7])))
                 outputFile.write( 'wavelength units = Unknown\n')
+                outputFile.close()
+
+                # Copy projection from WKT file
+                if wktFile is not None:
+                    if haveGDAL:
+                        self.addProj(filename, wktFile)
+                        # Reset the byte order
+                        enviHeaderFile = open(outputFileName,'r+')
+                        enviHeader = enviHeaderFile.read()
+                        enviHeader = enviHeader.replace('byte order = 0','byte order = 1')
+
+                        enviHeaderFile.write(enviHeader)
+                        enviHeaderFile.close()
+
+                    else:
+                        print("WARNING: No GDAL, can't set projection")
+
+                
 
         except IOError as e:
-            'IOError Occurred: ' + str(e)
+            print('IOError Occurred: ' + str(e))
             
 
-    def run(self, spatial, directory, extension):
+    def run(self, spatial, directory, extension, wktFile=None):
         filelist = list()
         self.findFiles(filelist, directory, extension)
         if(str(spatial) == 'spatial'):
-            self.generateENVIHeaderSpatial(filelist)
+            self.generateENVIHeaderSpatial(filelist, wktFile)
         else:
             self.generateENVIHeadersNoSpatial(filelist)
     

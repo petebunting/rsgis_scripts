@@ -30,8 +30,6 @@
 # Create the SLC and ISP parameter file in MSP format.
 par_EORC_PALSAR LEDFILENAME temp_hh.slc.par HHFILENAME temp_hh.slc
 par_EORC_PALSAR LEDFILENAME temp_hv.slc.par HVFILENAME temp_hv.slc
-par_EORC_PALSAR LEDFILENAME temp_vv.slc.par VVFILENAME temp_vv.slc
-par_EORC_PALSAR LEDFILENAME temp_vh.slc.par VVFILENAME temp_vh.slc
 #
 # Calibrate the SLCs. Since the SLCs are already corrected for antenna pattern, 
 # we only need to correct for the absolute calibration factor. 
@@ -40,11 +38,11 @@ par_EORC_PALSAR LEDFILENAME temp_vh.slc.par VVFILENAME temp_vh.slc
 # See https://auig.eoc.jaxa.jp/auigs/en/doc/an/20090109en_3.html
 radcal_SLC temp_hh.slc temp_hh.slc.par SCENENAME_hh.slc SCENENAME_hh.slc.par 1 - 0 0 1 0 -115.0
 radcal_SLC temp_hv.slc temp_hv.slc.par SCENENAME_hv.slc SCENENAME_hv.slc.par 1 - 0 0 1 0 -115.0
-radcal_SLC temp_vv.slc temp_vv.slc.par SCENENAME_vv.slc SCENENAME_vv.slc.par 1 - 0 0 1 0 -115.0
-radcal_SLC temp_vh.slc temp_vh.slc.par SCENENAME_vh.slc SCENENAME_vh.slc.par 1 - 0 0 1 0 -115.0
 
 # Generate a file with the SLC extents.
 SLC_corners SCENENAME_hh.slc.par > SCENENAME_hh.slc.corners
 SLC_corners SCENENAME_hv.slc.par > SCENENAME_hv.slc.corners
-SLC_corners SCENENAME_vv.slc.par > SCENENAME_vv.slc.corners
-SLC_corners SCENENAME_vh.slc.par > SCENENAME_vh.slc.corners
+
+# Remove temp files.
+rm temp*slc*
+

@@ -39,17 +39,17 @@
 # 
 set width = `grep width gSCENENAME.dem.par | cut -d : -f 1 --complement`
 
-sigma2gamma SCENENAME.hh.utm SCENENAME.inc SCENENAME.gamma.hh.utm $width
-sigma2gamma SCENENAME.hv.utm SCENENAME.inc SCENENAME.gamma.hv.utm $width
-sigma2gamma SCENENAME.vv.utm SCENENAME.inc SCENENAME.gamma.vv.utm $width
+sigma2gamma SCENENAME_hh.utm SCENENAME.inc SCENENAME.gamma_hh.utm $width
+sigma2gamma SCENENAME_hv.utm SCENENAME.inc SCENENAME.gamma_hv.utm $width
+sigma2gamma SCENENAME_vv.utm SCENENAME.inc SCENENAME.gamma_vv.utm $width
 
-product SCENENAME.gamma.hh.utm SCENENAME.pix SCENENAME.hh.utm.temp $width 1 1 0
-product SCENENAME.gamma.hv.utm SCENENAME.pix SCENENAME.hv.utm.temp $width 1 1 0
-product SCENENAME.gamma.vv.utm SCENENAME.pix SCENENAME.vv.utm.temp $width 1 1 0
+product SCENENAME.gamma_hh.utm SCENENAME.pix SCENENAME_hh.utm.temp $width 1 1 0
+product SCENENAME.gamma_hv.utm SCENENAME.pix SCENENAME_hv.utm.temp $width 1 1 0
+product SCENENAME.gamma_vv.utm SCENENAME.pix SCENENAME_vv.utm.temp $width 1 1 0
 
-lin_comb 1 SCENENAME.hh.utm.temp 0 0.777 SCENENAME.topo.hh.utm $width
-lin_comb 1 SCENENAME.hv.utm.temp 0 0.777 SCENENAME.topo.hv.utm $width
-lin_comb 1 SCENENAME.vv.utm.temp 0 0.777 SCENENAME.topo.vv.utm $width
+lin_comb 1 SCENENAME_hh.utm.temp 0 0.777 SCENENAME.topo_hh.utm $width
+lin_comb 1 SCENENAME_hv.utm.temp 0 0.777 SCENENAME.topo_hv.utm $width
+lin_comb 1 SCENENAME_vv.utm.temp 0 0.777 SCENENAME.topo_vv.utm $width
 
 # Remove temp files
 rm *temp
