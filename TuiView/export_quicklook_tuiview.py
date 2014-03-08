@@ -81,7 +81,6 @@ class ExportQuicklook(object):
             * RGB
             * ColourTable
             * Greyscape
-            * Band
         """
             
         if stretchType == None: # Set to default stretch
