@@ -32,15 +32,15 @@ class CreateALOSKML (object):
 
 	<!-- HH / HV -->
 	<rsgis:command algor="imagecalc" option="bandmaths" output="IMAGE_hhDivHV.env" expression="hh / hv" >
-		<rsgis:variable name="hh" image="IMAGE.topo.hh.utm" band="1" />
-		<rsgis:variable name="hv" image="IMAGE.topo.hv.utm" band="1" />
+		<rsgis:variable name="hh" image="IMAGE.topo_hh.utm" band="1" />
+		<rsgis:variable name="hv" image="IMAGE.topo_hv.utm" band="1" />
 	</rsgis:command>
 
 
 	<!-- Create Composite-->
 <rsgis:command algor="stackbands" option="imgs" output="IMAGE.env">
-	<rsgis:image file="IMAGE.topo.hh.utm" />
-	<rsgis:image file="IMAGE.topo.hv.utm" />
+	<rsgis:image file="IMAGE.topo_hh.utm" />
+	<rsgis:image file="IMAGE.topo_hv.utm" />
 	<rsgis:image file="IMAGE_hhDivHV.env" />
 </rsgis:command>
 
@@ -82,7 +82,7 @@ class CreateALOSKML (object):
             
                 for fileName in fileList:
                     inFile = fileName
-                    if fileName.find('.topo.hh.utm') > 0:
+                    if fileName.find('.topo_hh.utm') > 0:
                         baseFile = re.sub('\.topo\.hh\.utm','',fileName)
                         inBaseFile =  inDIR + '/' + directory + '/' + baseFile
                         self.createStack(inBaseFile)

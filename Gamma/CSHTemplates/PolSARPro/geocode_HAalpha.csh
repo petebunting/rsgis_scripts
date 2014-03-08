@@ -35,7 +35,7 @@ swap_bytes anisotropy.bin SCENENAME_anisotropy.ieee 4
 swap_bytes entropy.bin SCENENAME_entropy.ieee 4
 
 set w1 = `grep width gSCENENAME.dem.par |cut -d : -f 1 --complement`
-set rs1 = `grep range_samples SCENENAME.hh.mli.par |cut -d : -f 1 --complement`
+set rs1 = `grep range_samples SCENENAME_hh.mli.par |cut -d : -f 1 --complement`
 
 geocode_back SCENENAME_alpha.ieee "$rs1" gSCENENAME.utm_to_rdc SCENENAME_alpha.utm "$w1"
 geocode_back SCENENAME_anisotropy.ieee "$rs1" gSCENENAME.utm_to_rdc SCENENAME_anisotropy.utm "$w1"

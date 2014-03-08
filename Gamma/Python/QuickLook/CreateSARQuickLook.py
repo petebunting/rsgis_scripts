@@ -81,15 +81,13 @@ class CreateQuickLook (object):
         for file in fileList:
             extmatch = self.findExtension(file, ext)
             if extmatch:
-                print(file)
                 inFilename = file
                 baseFile = self.removeExtension(file, ext)
                 command_scale = self.getScaleLine(baseFile)
                 
                 if ext == '.hdr':
                     inFilename = baseFile
-                command = command_gdal + command_of + command_ot + command_size + command_scale + ' ' + inFilePath + '/' + inFilename + ' ' + outFilePath + '/' + baseFile + 'ql.png'
-                print(command)
+                command = command_gdal + command_of + command_ot + command_size + command_scale + ' ' + inFilePath + '/' + inFilename + ' ' + outFilePath + '/' + baseFile + 'ql.png > /dev/null'
                 os.system(command)
             
     def run(self, inFilePath, outFilePath, inputExtension):

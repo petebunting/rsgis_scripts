@@ -39,11 +39,11 @@
 # 
 set width = `grep width gSCENENAME.dem.par | cut -d : -f 1 --complement`
 
-sigma2gamma SCENENAME.hh.utm SCENENAME.inc SCENENAME.gamma.hh.utm $width
+sigma2gamma SCENENAME_hh.utm SCENENAME.inc SCENENAME.gamma_hh.utm $width
 
-product SCENENAME.gamma.hh.utm SCENENAME.pix SCENENAME.hh.utm.temp $width 1 1 0
+product SCENENAME.gamma_hh.utm SCENENAME.pix SCENENAME_hh.utm.temp $width 1 1 0
 
-lin_comb 1 SCENENAME.hh.utm.temp 0 0.777 SCENENAME.topo.hh.utm $width
+lin_comb 1 SCENENAME_hh.utm.temp 0 0.777 SCENENAME.topo_hh.utm $width
 
 # Remove temp files
 rm *temp

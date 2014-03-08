@@ -1,6 +1,6 @@
 #! /bin/csh
 #
-# Script to process RAW ALOS data to Level 1_1
+# Script to post-process subset panchromatic image
 #
 # Created by Dan Clewley (IGES/AU).
 # Copyright 2012 Dan Clewley. All rights reserved.
@@ -23,13 +23,9 @@
 # ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# Script to process Topographically correct ALOS data
-# using the method of Castel et al. 2001:
 #
 # Swap Bytes
 swap_bytes  SCENENAME_pan_sub SCENENAME_pan_sub_swap 2
 
 mv SCENENAME_pan_sub_swap SCENENAME_pan_sub
 
-# Display DEM
-#disdem_par Siberia.eqa.dem_new Siberia.dem_par

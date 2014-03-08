@@ -23,6 +23,7 @@
 
 import os, sys, csv, glob
 from rios import rat
+import subprocess
 import tempfile as tempfile
 sys.path.append(os.sys.path[0])
 import ssurgofields as sf
@@ -30,11 +31,13 @@ import ssurgofields as sf
 if len(sys.argv) == 3:
     inDIRName = sys.argv[1] 
     outColName = sys.argv[2] 
-    outRes = '30' # Set default to 30 m
+    outXRes = '30' # Set default to 30 m
+    outYRes = '-30' # Set default to 30 m
 elif len(sys.argv) >= 4:
     inDIRName = sys.argv[1] 
     outColName = sys.argv[2] 
-    outRes = str(sys.argv[4])
+    outXRes = str(sys.argv[3])
+    outYRes = '-' + outXRes
 else:
     print('''Create Raster Atttribute Table (RAT) in KEA format from SSURGO data.
 If the KEA file exists, new attributes are appended to the RAT.
@@ -54,7 +57,7 @@ outColNum = cHorizonFields[outColName.strip()]
 
 # CREATE RASTER ATTRIBUTE TABLE
 inSpatialDIR = os.path.join(inDIRName,'spatial')
-inSHPName = glob.glob(inSpatialDIR + '/soilmu_a_*.shp')[0]
+inSHPName = glob.glob(inSpatialDIR + '/*soilmu_a_*.shp')[0]
 inSHPFile = os.path.join(inSpatialDIR,inSHPName)
  
 outKEAFile = inSHPFile.replace('.shp','_raster.kea')
@@ -67,9 +70,8 @@ outRasterImageScript = outRasterImageScript.replace('.env','.xml')
 if os.path.exists(outKEAFile) == False: 
     # Rasterize polygon using gdal
     print('Creating raster')
-    rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr ' + outRes + ' ' + outRes + ' -a MUKEY ' + inSHPFile + ' ' + outKEAFile + ' > /dev/null'
-    print(rasterizeCommand)
-    os.system(rasterizeCommand)
+    rasterizeCommand = 'gdal_rasterize -of KEA -ot UInt32 -tr ' + outXRes + ' ' + outYRes + ' -a MUKEY ' + inSHPFile + ' ' + outKEAFile
+    subprocess.call(rasterizeCommand, shell=True)
     
     print('Converting to RAT')
     # Convert to RAT using RSGIS
@@ -85,7 +87,7 @@ if os.path.exists(outKEAFile) == False:
     outXMLFile.write(outRSGISText)
     outXMLFile.close()
     # Run RSGISLib
-    os.system('rsgisexe -x ' + outXMLName + ' > /dev/null')
+    subprocess.call('rsgisexe -x ' + outXMLName , shell=True)
     # Remove temp file
     os.remove(outXMLName)
 

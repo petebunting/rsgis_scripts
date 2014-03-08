@@ -1,9 +1,28 @@
 c~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 c Slope calculation routine. Designed to be called from python
 c
-c Daniel Clewley (clewley@usc.edu) - 27/06/2013
+c Daniel Clewley (daniel.clewley@gmail.com) - 27/06/2013
 c
-c Adapted from EASI code by Jane Whitcomb
+c Copyright 2014 Daniel Clewley & Jane Whitcomb.
+c 
+c Permission is hereby granted, free of charge, to any person 
+c obtaining a copy of this software and associated documentation 
+c files (the "Software"), to deal in the Software without restriction, 
+c including without limitation the rights to use, copy, modify, 
+c merge, publish, distribute, sublicense, and/or sell copies of the 
+c Software, and to permit persons to whom the Software is furnished 
+c to do so, subject to the following conditions:
+c 
+c The above copyright notice and this permission notice shall be 
+c included in all copies or substantial portions of the Software.
+c 
+c THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+c EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+c OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+c IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
+c ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
+c CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+c WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 c
 c~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

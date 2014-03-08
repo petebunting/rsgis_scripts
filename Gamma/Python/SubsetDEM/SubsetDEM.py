@@ -7,16 +7,28 @@
 # Author: Dan Clewley
 # Email: ddc06@aber.ac.uk
 # Date: 16/04/2010
-# Version: 1.1
+# Version: 1.2
 # 
-# Update added quiet option so messages are printed
+# 1.1
+# Added quiet option so messages are printed
 # when running from command line but
 # not within other scripts
 # Dan Clewley - 25/02/2011
+#
+# 1.2
+# Use GDAL to convert corner coordinates to target projection
+# Re-projection now only performed once.
+#
 #######################################
 
-import os.path
+import os
+import subprocess
 import sys, re
+
+try:
+    from osgeo import osr
+except ImportError:
+    print('Need GDAL (built with Python bindings) to perform coordinate transform')
 
 class SubsetDEM (object):
         
@@ -30,7 +42,7 @@ class SubsetDEM (object):
         if(os.path.isfile(testFile)):
             return True
         else:
-            print(('Could not find ' + testFile))
+            print('Could not find ' + testFile)
             raise BaseException
     
     def getCorners(self, gammaCornerFile, outCorners):
@@ -54,83 +66,78 @@ class SubsetDEM (object):
                             
                 gammaCorners.close()
             except IOError as e:
-                print(('\nCould not open corners file: ', e))
+                print('\nCould not open corners file: ', e)
                 raise IOError(e)
         else:
             raise BaseException            
 
-    def createSubset(self, srtmName, srtmSubName, corners, projFile, res):
-        dataSizeDeg = str(0.000277777777782)
-        if res == 5:
-            dataSizeDeg = str(0.00007524)
-            
-        if self.quiet:
-            subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, corners[2], corners[0], corners[3], corners[1], dataSizeDeg, dataSizeDeg, srtmName, srtmSubName)
-        else:
-            subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, corners[2], corners[0], corners[3], corners[1], dataSizeDeg, dataSizeDeg, srtmName, srtmSubName)
-            print(subCMD)
-        os.system(subCMD)
+    def convertCoordinates(self, inCoords, outProjFile):
+        """ Convert coordinates from Lat/Long (WGS-84) to 
+            projection defined by WKT file.
+            Takes list of coordinates as tuples.
+        """
+        # Set source spatial reference system
         
-    def reProjectReSample(self, srtmSubName, reProjSRTM, projFile):
-        if self.quiet:
-            subCMD = 'gdalwarp -t_srs %s -tr 12.5 12.5 -order 3 -r bilinear -of ENVI -ot UInt16 %s %s > temp_log.txt' % (projFile, srtmSubName, reProjSRTM)
-        else:
-            subCMD = 'gdalwarp -t_srs %s -tr 12.5 12.5 -order 3 -r bilinear -of ENVI -ot UInt16 %s %s' % (projFile, srtmSubName, reProjSRTM)
-            print(subCMD)
-        os.system(subCMD)          
+        srcSRS = osr.SpatialReference()
+        srcSRS.ImportFromEPSG(4326)
+        
+        # Read in WKT file
+        outProjWKTFile = open(outProjFile,'r')
+        outProjWKT = outProjWKTFile.read()
+        outProjWKTFile.close()
+        
+        # Set destination spatial reference system
+        dstSRS = osr.SpatialReference()
+        dstSRS.ImportFromWkt(outProjWKT)
+        
+        # Transform coordinates
+        ctr = osr.CoordinateTransformation(srcSRS, dstSRS)
+        outCoordsTuple = ctr.TransformPoints(inCoords)
+
+        # Convert to list
+        outCoords = []
+        for coord in outCoordsTuple:
+            outCoords.append([coord[0],coord[1]])
+            
+        return outCoords
     
-    def run(self, inSRTMFile, outSRTMSub, gammaCornerFile, llProjFile, utmProjFile, res=30):
+    def createSubset(self, srtmName, srtmSubName, corners, outProjFile, targetRes=30):
+            
+        # Buffer corners by 100 * targetRes
+
+        corners[0][0] = corners[0][0] - 100*targetRes # xmin
+        corners[0][1] = corners[0][1] - 100*targetRes # ymin
+        corners[1][0] = corners[1][0] + 100*targetRes # xmax
+        corners[1][1] = corners[1][1] + 100*targetRes # ymax
+
+        if self.quiet:
+            subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot Float32 -r cubic -overwrite %s %s > /dev/null' % (outProjFile, corners[0][0], corners[0][1], corners[1][0], corners[1][1], targetRes, targetRes, srtmName, srtmSubName)
+        else:
+            subCMD = 'gdalwarp -t_srs %s -te %s  %s %s %s -tr %s %s -of ENVI -ot Float32 -r cubic -overwrite %s %s' % (outProjFile, corners[0][0], corners[0][1], corners[1][0], corners[1][1], targetRes, targetRes, srtmName, srtmSubName)
+            print(subCMD)
+        subprocess.call(subCMD,shell=True)  
+    
+    def run(self, inSRTMFile, outSRTMSub, gammaCornerFile, outProjFile, targetRes=30):
         # Check files
         self.checkFile(inSRTMFile)
         self.checkFile(gammaCornerFile)
-        self.checkFile(llProjFile)
-        self.checkFile(utmProjFile)
-        
-        tempSRTM = outSRTMSub + 'temp'
-        tempSRTMhdr = tempSRTM + '.hdr'
-        # Remove existing output files
-        try:
-            os.remove(outSRTMSub)
-            if self.quiet == False:
-                print(('replacing existing file: ' + outSRTMSub))
-        except OSError as e:
-            if self.quiet == False:
-                print(('saving to ' + outSRTMSub))
-            
-        try:
-            os.remove(tempSRTM)
-            if self.quiet == False:
-                print(('replacing existing file: ' + tempSRTM))
-        except OSError as e:
-            if self.quiet == False:
-                print(('saving temp file: ' + tempSRTM + ', will remove after'))
+        self.checkFile(outProjFile)
         
         # Get corners from corners file
         outCorners = []
-        self.getCorners(gammaCornerFile, outCorners)
+        self.getCorners(gammaCornerFile,outCorners)
+        
+        outCornersTuple = [(outCorners[2], outCorners[0]), (outCorners[3], outCorners[1])]
+        
+        # Get corners in target projection
+        cornersDSR = self.convertCoordinates(outCornersTuple, outProjFile)
         
         # Subset DEM
-        self.createSubset(inSRTMFile, tempSRTM, outCorners, llProjFile, res)
+        self.createSubset(inSRTMFile, outSRTMSub, cornersDSR, outProjFile, targetRes)
         
-        # Reproject and resample DEM
-        self.reProjectReSample(tempSRTM, outSRTMSub, utmProjFile)
-        
-        # Remove temp DEM
-        try:
-            os.remove(tempSRTM)
-            if self.quiet == False:
-                print(('removing temp file: ' + tempSRTM))
-            try:
-                os.remove(tempSRTMhdr)
-            except OSError as e:
-            	if self.quiet == False:
-            	   print(('can\'t remove temp header file: ' + tempSRTM + '.env'))
-        except OSError as e:
-            if self.quiet == False:
-                print(('can\'t remove temp file: ' + tempSRTM))
 
     def help(self):
-        print('python SubsetDEM.py <inSRTMFile> <outSRTMSub> <gammaCornerFile> <llProjFile> <utmProjFile>')
+        print('python SubsetDEM.py <inSRTMFile> <outSRTMSub> <gammaCornerFile> <outProjFile> <target res>')
         
 if __name__ == '__main__':
     obj = SubsetDEM()
@@ -139,9 +146,9 @@ if __name__ == '__main__':
         inSRTMFile = sys.argv[1].strip()
         outSRTMSub = sys.argv[2].strip()
         gammaCornerFile = sys.argv[3].strip()
-        llProjFile = sys.argv[4].strip()
-        utmProjFile = sys.argv[5].strip()
+        outProjFile = sys.argv[4].strip()
+        targetRes = float(sys.argv[5].strip())
         obj.setOutputMessages()
-        obj.run(inSRTMFile, outSRTMSub, gammaCornerFile, llProjFile, utmProjFile)
+        obj.run(inSRTMFile, outSRTMSub, gammaCornerFile, outProjFile, targetRes)
     else:
         obj.help()

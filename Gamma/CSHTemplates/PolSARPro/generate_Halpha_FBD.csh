@@ -31,8 +31,8 @@
 # 
 
 # Get range and azimuth samples from parameter file
-set rs = `grep range_samples SCENENAME.hh.slc.par |cut -d : -f 1 --complement`
-set az = `grep azimuth_lines SCENENAME.hh.slc.par |cut -d : -f 1 --complement`
+set rs = `grep range_samples SCENENAME_hh.slc.par |cut -d : -f 1 --complement`
+set az = `grep azimuth_lines SCENENAME_hh.slc.par |cut -d : -f 1 --complement`
 set looks = 4 # Set the number of azimuth looks (must be the same as used to generate mli image)
 @ azlook = $az / $looks
 
@@ -41,7 +41,7 @@ set looks = 4 # Set the number of azimuth looks (must be the same as used to gen
 #echo $azlook
 
 # # Import SLC data
-rawbinary_convert_Cmplx_MLK_SPP.exe ./ $rs 0 0 $az $rs 1 0 C2 1 5 PP1 SCENENAME.hh.slc SCENENAME.hv.slc
+rawbinary_convert_Cmplx_MLK_SPP.exe ./ $rs 0 0 $az $rs 1 0 C2 1 5 PP1 SCENENAME_hh.slc SCENENAME_hv.slc
 
 #
 # # Decomposition

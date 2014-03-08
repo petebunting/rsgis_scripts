@@ -36,14 +36,14 @@
 #
 
 # The first step is to create a Multi-Look Image(MLI) from the SLC
-multi_look SCENENAME.hh.slc SCENENAME.hh.slc.par SCENENAME.hh.mli SCENENAME.hh.mli.par 1 7
-multi_look SCENENAME.hv.slc SCENENAME.hv.slc.par SCENENAME.hv.mli SCENENAME.hv.mli.par 1 7
-multi_look SCENENAME.vv.slc SCENENAME.vv.slc.par SCENENAME.vv.mli SCENENAME.vv.mli.par 1 7
+multi_look SCENENAME_hh.slc SCENENAME_hh.slc.par SCENENAME_hh.mli SCENENAME_hh.mli.par 1 7
+multi_look SCENENAME_hv.slc SCENENAME_hv.slc.par SCENENAME_hv.mli SCENENAME_hv.mli.par 1 7
+multi_look SCENENAME_vv.slc SCENENAME_vv.slc.par SCENENAME_vv.mli SCENENAME_vv.mli.par 1 7
 #
 # The second step is to generate a initial lookup table (LUT), that will tell us for each pixel of the DEM image
 # which is the corresponding pixel in the SAR image. The file "gSCENENAME.dem.par" contains all the parameters
 # for the geocoded SAR data.
-gc_map SCENENAME.hh.mli.par -  SCENENAME_srtm_sub_par SCENENAME_srtm_sub gSCENENAME.dem.par gSCENENAME.dem gSCENENAME.rough.geo_to_rdc 0.5 0.5	 SCENENAME.sim.sar - - SCENENAME.inc - SCENENAME.pix
+gc_map SCENENAME_hh.mli.par -  SCENENAME_srtm_sub_par SCENENAME_srtm_sub gSCENENAME.dem.par gSCENENAME.dem gSCENENAME.rough.geo_to_rdc 0.5 0.5	 SCENENAME.sim.sar - - SCENENAME.inc - SCENENAME.pix
 #
 # The third step is to transform the Landsat image from own geocoding to geocoding map projection. As the Landsat image
 # is already in the same projection of the geocoding map projection, this command will only extract the part of the
@@ -57,17 +57,17 @@ uchar2float gSCENENAME.landsat.uchar gSCENENAME.landsat.float
 # a)we need to transform the region Landsat image from map to SAR geometry. To get the number of columns
 # (width) of the Landsat image in map geometry we can use, e.g., the command "grep width gSCENENAME.dem.par". To
 # get the number of samples of the Landsat image in SAR geometry we can use, e.g., the command
-# "grep range_samples SCENENAME.hh.mli.par".
+# "grep range_samples SCENENAME_hh.mli.par".
 # For the resampling we can choose several methods, in this case we use nearest neighbour, and several
 # image formats, in this case we choose float.
 set w1 = `grep width gSCENENAME.dem.par |cut -d : -f 1 --complement`
-set rs1 = `grep range_samples SCENENAME.hh.mli.par |cut -d : -f 1 --complement`
+set rs1 = `grep range_samples SCENENAME_hh.mli.par |cut -d : -f 1 --complement`
 geocode gSCENENAME.rough.geo_to_rdc gSCENENAME.landsat.float "$w1" SCENENAME.landsat.sar "$rs1"
 
 #
 # If we want we can compare the Landsat and the actual SAR images, in radar geometry, in order to have
 # a feel for the overlap between the two images.
-#dis2pwr SCENENAME.landsat.sar SCENENAME.hh.mli "$rs1" "$rs1"
+#dis2pwr SCENENAME.landsat.sar SCENENAME_hh.mli "$rs1" "$rs1"
 #
 # b)To compute the offsets between the Landsat image and the actual SAR we apply a procedure similar
 # to the co-registration of two SLC images for interferometry. First of all we need to generate a file
@@ -80,25 +80,25 @@ geocode gSCENENAME.rough.geo_to_rdc gSCENENAME.landsat.float "$w1" SCENENAME.lan
 # enter number of offset measurements in range, azimuth:  16  16
 # search window sizes (32, 64, 128...) (range, azimuth):  256  256
 # minimum matching SNR (nominal=6.5):      7.000
-create_diff_par SCENENAME.hh.mli.par - SCENENAME.diff_par 1 < /usr/local/GAMMA_20081204/EssentialFiles/diff_par_in
+create_diff_par SCENENAME_hh.mli.par - SCENENAME.diff_par 1 < $GAMMA_ESSENTIAL_FILES/diff_par_in
 #
 # First guess of offsets (not required, but helpful in some cases). If the two images have small contrast,
 # "init_offsetm" might lead to a wrong estimate of the constant offsets. It is therefore recommended to use
 # this command with care.
-init_offsetm SCENENAME.hh.mli SCENENAME.landsat.sar SCENENAME.diff_par > SCENENAME.geocode_error.txt
+init_offsetm SCENENAME_hh.mli SCENENAME.landsat.sar SCENENAME.diff_par > SCENENAME_geocode_error.txt
 #
 # Second, to find the local offsets we take windows all over the images and in each we compute the offset in range
 # and azimuth by correlating the intensities. For the offset computation we apply a several-step procedure.
 # The sequence offset_pwrm offset_fitm shall be run as many times as possible, playing with number of windows and
 # window size.
-offset_pwrm SCENENAME.hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 8 32
-offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 1 >> SCENENAME.geocode_error.txt
-offset_pwrm SCENENAME.hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 16 64
-offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME.geocode_error.txt
-offset_pwrm SCENENAME.hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 24 96
-offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME.geocode_error.txt
-offset_pwrm SCENENAME.hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 96 96 gSCENENAME_offsets_hh 1 24 96
-offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME.geocode_error.txt
+offset_pwrm SCENENAME_hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 8 32
+offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 1 >> SCENENAME_geocode_error.txt
+offset_pwrm SCENENAME_hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 16 64
+offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME_geocode_error.txt
+offset_pwrm SCENENAME_hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 128 128 gSCENENAME_offsets_hh 1 24 96
+offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME_geocode_error.txt
+offset_pwrm SCENENAME_hh.mli SCENENAME.landsat.sar SCENENAME.diff_par gSCENENAME_offs_hh gSCENENAME_snr_hh 96 96 gSCENENAME_offsets_hh 1 24 96
+offset_fitm gSCENENAME_offs_hh gSCENENAME_snr_hh SCENENAME.diff_par gSCENENAME_coffs_hh gSCENENAME_coffsets_hh - 3 >> SCENENAME_geocode_error.txt
 #
 # To refine the lookup table based on the offset polynomial. The new refined lookup table (*.utm_to_rdc)
 # contains now at each pixel (i.e. map position) the correct position of a pixel in the SAR image. The value
@@ -110,14 +110,14 @@ gc_map_fine gSCENENAME.rough.geo_to_rdc "$w1" SCENENAME.diff_par gSCENENAME.utm_
 #geocode gSCENENAME.utm_to_rdc $landsat.gSCENENAME.float "$w1" $landsat.gSCENENAME.ref "$rs1"
 #
 # and display the two, for comparison;
-#dis2pwr $landsat.gSCENENAME.ref SCENENAME.hh.mli "$rs1" "$rs1"
+#dis2pwr $landsat.gSCENENAME.ref SCENENAME_hh.mli "$rs1" "$rs1"
 #
 # Finally, to geocode the MLI images.
-geocode_back SCENENAME.hh.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME.hh.utm "$w1"
-geocode_back SCENENAME.hv.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME.hv.utm "$w1"
-geocode_back SCENENAME.vv.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME.vv.utm "$w1"
+geocode_back SCENENAME_hh.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME_hh.utm "$w1"
+geocode_back SCENENAME_hv.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME_hv.utm "$w1"
+geocode_back SCENENAME_vv.mli "$rs1" gSCENENAME.utm_to_rdc SCENENAME_vv.utm "$w1"
 #
 # Generate the SUN raster file (*.ras) for the MLI geocoded image.
-#raspwr SCENENAME.hh.utm "$w1" - - 10 10
-#raspwr SCENENAME.hv.utm "$w1" - - 10 10
+#raspwr SCENENAME_hh.utm "$w1" - - 10 10
+#raspwr SCENENAME_hv.utm "$w1" - - 10 10
 #

@@ -1,12 +1,13 @@
-rawSLCTemplate:/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/General/FBD_raw_to_SLC_template.csh
-slcGeoTemplate:/data/home/ddc06/Documents/Development/Gamma/CSHTemplates/General/FBD_SLC_to_GEO_withPAN_template.csh
-dem:/data/Australia/Basedata/SRTM/shraem_aus_20000211_ac0g0.tif
-pan:/data/Australia/Basedata/LandsatPan/NILband8.ers
-outProj:/data/home/ddc06/Documents/Development/Gamma/Projection/utm_z55.wkt
-demRes:30
+rawSLCTemplate:/home/dan/RSGISScripts/Gamma/gCSHTemplates/General/FBD_JAXA_1_1_to_SLC_template.csh
+slcGeoTemplate:/home/dan/RSGISScripts/Gamma/gCSHTemplates/General/FBD_SLC_to_GEO_template.csh
+dem:/home/dan/gamma/DEM/ALPSRP193461300_srtm_sub
+outProjWKT:/home/dan/RSGISScripts/WKT/UTM_WGS84/UTM_WGS84_Z55_S.wkt
+outProjName:UTM
+targetRes:12.5
+outext:kea
+thetaref:39
 subsetDEM:True
-subsetPan:True
-genAlphaEntropy:False
+topoFilterSize:5
 topoCorrect:True
-metaContactName:Dan Clewley / Richard Lucas
-metaContactEmail:ddc06@aber.ac.uk / rml@aber.ac.uk
+metaContactName:Dan Clewley
+metaContactEmail:clewley@usc.edu

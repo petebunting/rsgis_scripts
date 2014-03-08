@@ -13,7 +13,7 @@
 import os.path, sys, re
 
 # Add extension of files to search for
-extListString = 'cpp,h,r,py,txt,sh,html,php,xml,f,tex' 
+extListString = 'cpp,h,r,py,txt,sh,html,php,xml,f,tex,csh,pl' 
 
 class findReplaceObj(object):
     ''' Object to find and replace strings within
