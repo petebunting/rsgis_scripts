@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# A script to export quicklooks for 
-# Using TuiView,
+# A script to export quicklooks  
+# using TuiView,
 #
 # Dan Clewley (daniel.clewley@googlemail.com)
 # 07/03/2014
