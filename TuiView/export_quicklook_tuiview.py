@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #
 # A script to export quicklooks for 
-# all bands in an image or an RGB image
-# using TuiView
+# Using TuiView,
 #
 # Dan Clewley (daniel.clewley@googlemail.com)
 # 07/03/2014
+#
+# Based on TuiView example:
+# https://bitbucket.org/chchrsc/tuiview/wiki/Saving%20Images%20From%20Python
 #
 
 import sys, os, argparse
@@ -39,9 +41,11 @@ class ExportQuicklook(object):
         
         outWidth = width
         if height is None:
-            outHeight = outWidth * int(ySize / xSize)
+            outHeight = int(outWidth * (ySize / xSize))
         else:
             outHeight = args.height
+
+        print("OutputImage size {0} x {1}".format(outWidth, outHeight))
         
         # Resize
         self.viewer.resizeForWidgetSize(outWidth, outHeight)
@@ -95,6 +99,7 @@ class ExportQuicklook(object):
         
             # save as .png, .jpg etc
             # also saves .wld file
+            print('Saving to:',outImage)
             self.viewer.saveCurrentViewInternal(outImage)
             # Remove world image
             if not self.keepwld:
@@ -106,21 +111,52 @@ class ExportQuicklook(object):
             if args.invector is not None:
                 self.viewer.removeLayer()
     
-    def runRGB(self):
-        """ Export RGB image. Assumes image has already been stretched
-            and RGB mapped to bands 1,2,3.
+    def runSingleImage(self, stretchType = None, bands=None, stretchData=True):
+        """ Export single image using default or 
+            specified stretchType:
+            * RGB
+            * ColourTable
+            * Greyscape
+            * Band
         """
             
         outImage = self.outimage
 
-        stretch = ViewerStretch()
-        stretch.setBands((1,2,3))
-        stretch.setRGB()
-        stretch.setNoStretch()
-        
-        # Add the file
-        self.viewer.addRasterInternal(self.inimage, stretch)
-        
+        if stretchType == None: # Set to default stretch
+            self.app.setApplicationName('viewer')
+            self.app.setOrganizationName('Viewer')
+            self.viewer.addRasterInternal(self.inimage)
+
+        elif stretchType.lower() == 'rgb':
+            if bands == None:
+                bands = (1,2,3)
+            stretch = ViewerStretch()
+            stretch.setBands(bands)
+            stretch.setRGB()
+            if stretchData:
+                stretch.setStdDevStretch()
+            else:
+                stretch.setNoStretch()
+            self.viewer.addRasterInternal(self.inimage, stretch)
+        elif stretchType.lower() == 'greyscale':
+            if bands == None:
+                bands = (1,)
+            stretch = ViewerStretch()
+            stretch.setBands(bands)
+            stretch.setGreyScale()
+            if stretchData:
+                stretch.setStdDevStretch()
+            else:
+                stretch.setNoStretch()
+            self.viewer.addRasterInternal(self.inimage, stretch)
+        elif stretchType.lower() == 'colortable' or stretchType.lower() == 'colourtable': 
+            if bands == None:
+                bands = (1,)
+            stretch = ViewerStretch()
+            stretch.setBands(bands)
+            stretch.setColorTable()
+            self.viewer.addRasterInternal(self.inimage, stretch)
+       
         # Zoom to extent
         self.viewer.zoomFullExtent()
         
@@ -138,6 +174,7 @@ class ExportQuicklook(object):
         
         # save as .png, .jpg etc
         # also saves .wld file
+        print('Saving to:',outImage)
         self.viewer.saveCurrentViewInternal(outImage)
         # Remove world image
         if not self.keepwld:
@@ -162,18 +199,32 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--invector", type=str, default=None, help="Input vector (optional)",required=False)
     parser.add_argument("-o", "--outimage", type=str, help="Output image (s)", required=True)
     parser.add_argument("--width", type=int, default=500, help="Output width (default 500 pixels)", required=False)
-    parser.add_argument("--height", type=int, default=None, help="Output height (default based on width to preserve ratio of origional image)", required=False)
+    parser.add_argument("--height", type=int, default=None, help="Output height (default based on width to preserve ratio of original image)", required=False)
     parser.add_argument("--keepwld", default=False, action='store_true', help="Keep spatial information file (default is to remove)", required=False)
     parser.add_argument("--allbands", action='store_true', default=False, help="Run for all bands")
-    parser.add_argument("--rgb", action='store_true', default=False, help="Export RGB image (assumes already stretched)")
+    parser.add_argument("--rgb", action='store_true', default=False, help="Export RGB image")
+    parser.add_argument("--greyscale", action='store_true', default=False, help="Export Greyscale image")
+    parser.add_argument("--colortable", action='store_true', default=False, help="Export colour table")
+    parser.add_argument("--nostretch", action='store_true', default=False, help="Don't stretch data (use if data has already been stretched")
     args = parser.parse_args()    
 
     ql = ExportQuicklook(args.inimage, args.outimage, args.width, args.height, args.invector, args.keepwld)
 
+    stretchData = True
+    if args.nostretch:
+        stretchData = False
+
     if args.allbands:
         ql.runAllBands()
-    elif args.rgb:
-        ql.runRGB()
+    else:
+        stretchType = None
+        if args.rgb:
+            stretchType = 'RGB'
+        elif args.greyscale:
+            stretchType = 'Greyscale'
+        elif args.colortable:
+            stretchType = 'Colortable'
+        ql.runSingleImage(stretchType, None, stretchData)
 
     ql = None
     
