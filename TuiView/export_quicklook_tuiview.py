@@ -18,10 +18,9 @@ from tuiview.viewerstretch import ViewerStretch
 
 class ExportQuicklook(object):
 
-    def __init__(self, inImage, outImage, width=500, height=None, inVector=None, keepwld=False):
+    def __init__(self, inImage, width=500, height=None, inVector=None, keepwld=False):
 
         self.inimage = inImage
-        self.outimage = outImage
         self.invector = inVector
         self.keepwld = keepwld
 
@@ -51,12 +50,12 @@ class ExportQuicklook(object):
         self.viewer.resizeForWidgetSize(outWidth, outHeight)
 
 
-    def runAllBands(self):
+    def runAllBands(self, outImage):
         """ Create a separate image for all bands
         """
 
-        outimageBase = os.path.splitext(self.outimage)[0]
-        outimageExt = os.path.splitext(self.outimage)[1]
+        outimageBase = os.path.splitext(outImage)[0]
+        outimageExt = os.path.splitext(outImage)[1]
         # Loop through number of bands in image
         nBands = self.dataset.RasterCount
                 
@@ -74,44 +73,9 @@ class ExportQuicklook(object):
         
                 outImage = outimageBase + '_' + bandName + outimageExt
         
-            stretch = ViewerStretch()
-            stretch.setBands((band,))
-            stretch.setGreyScale()
-            stretch.setStdDevStretch()
-            
-            # Add the file
-            self.viewer.addRasterInternal(self.inimage, stretch)
-            
-            # Zoom to extent
-            self.viewer.zoomFullExtent()
-        
-            if self.invector is not None:
-                # add the vector
-                self.viewer.addVectorInternal(self.invector)
-                # now retrieve the 'layer' that represents the vector
-                vecLayer = self.viewer.viewwidget.layers.getTopVectorLayer()
-                # set any properties
-                vecLayer.setLineWidth(1)
-                vecLayer.setColor([255, 255, 0, 255]) # red, green, blue, alpha
-                # lastly, do this to update window
-                vecLayer.getImage()
-                self.viewer.viewwidget.update()
-        
-            # save as .png, .jpg etc
-            # also saves .wld file
-            print('Saving to:',outImage)
-            self.viewer.saveCurrentViewInternal(outImage)
-            # Remove world image
-            if not self.keepwld:
-                os.remove(outImage + 'w')
-            
-            # Remove layer
-            self.viewer.removeLayer()
-            # Remove vector layer (if added)
-            if args.invector is not None:
-                self.viewer.removeLayer()
+            self.runSingleImage(outImage, stretchType='Greyscale', bands=(band,), stretchData=True)
     
-    def runSingleImage(self, stretchType = None, bands=None, stretchData=True):
+    def runSingleImage(self, outImage, stretchType = None, bands=None, stretchData=True):
         """ Export single image using default or 
             specified stretchType:
             * RGB
@@ -120,8 +84,6 @@ class ExportQuicklook(object):
             * Band
         """
             
-        outImage = self.outimage
-
         if stretchType == None: # Set to default stretch
             self.app.setApplicationName('viewer')
             self.app.setOrganizationName('Viewer')
@@ -208,14 +170,14 @@ if __name__ == "__main__":
     parser.add_argument("--nostretch", action='store_true', default=False, help="Don't stretch data (use if data has already been stretched")
     args = parser.parse_args()    
 
-    ql = ExportQuicklook(args.inimage, args.outimage, args.width, args.height, args.invector, args.keepwld)
+    ql = ExportQuicklook(args.inimage, args.width, args.height, args.invector, args.keepwld)
 
     stretchData = True
     if args.nostretch:
         stretchData = False
 
     if args.allbands:
-        ql.runAllBands()
+        ql.runAllBands(args.outimage)
     else:
         stretchType = None
         if args.rgb:
@@ -224,7 +186,7 @@ if __name__ == "__main__":
             stretchType = 'Greyscale'
         elif args.colortable:
             stretchType = 'Colortable'
-        ql.runSingleImage(stretchType, None, stretchData)
+        ql.runSingleImage(args.outimage, stretchType, None, stretchData)
 
     ql = None
     
