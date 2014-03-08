@@ -100,29 +100,29 @@ else:
         outKMZBase = os.path.splitext(args.outkmz)[0]
         outKMZExt = os.path.splitext(args.outkmz)[1]
 
-        dataset = gdal.Open(args.inimage, gdal.GA_ReadOnly)
+    dataset = gdal.Open(args.inimage, gdal.GA_ReadOnly)
+            
+    # Loop through number of bands in image
+    nBands = dataset.RasterCount
         
-        # Loop through number of bands in image
-        nBands = dataset.RasterCount
+            
+    for i in range(nBands):
+        band = i + 1
+        bandName = dataset.GetRasterBand(band).GetDescription()
+        if bandName == "":
+            bandName = 'b' + str(band)
+        else:
+            bandName = bandName.replace(' ','_')
     
-        
-        for i in range(nBands):
-            band = i + 1
-            bandName = dataset.GetRasterBand(band).GetDescription()
-            if bandName == "":
-                bandName = 'b' + str(band)
-            else:
-                bandName = bandName.replace(' ','_')
-
-            outImage = outimageBase + '_' + bandName + outimageExt
-
-            if args.outkmz:
-                outKMZ = outKMZBase + '_' + bandName + outKMZExt
-            else:
-                outKMZ = None
-
-            colourImage(args.inimage, outImage, band, outKMZ)
-      
+        outImage = outimageBase + '_' + bandName + outimageExt
+    
+        if args.outkmz:
+            outKMZ = outKMZBase + '_' + bandName + outKMZExt
+        else:
+            outKMZ = None
+    
+        colourImage(args.inimage, outImage, band, outKMZ)
+          
     
 
 
