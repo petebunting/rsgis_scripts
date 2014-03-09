@@ -6,7 +6,7 @@ https://bitbucket.org/petebunting/rsgis_scripts/
 Unless otherwise stated, all scripts are made available under
 the following licence:
 
-Copyright (c) 2013 Peter Bunting and Daniel Clewley
+Copyright (c) 2014 Peter Bunting and Daniel Clewley
 
 Permission is hereby granted, free of charge, to any person 
 obtaining a copy of this software and associated documentation 
