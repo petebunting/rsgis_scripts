@@ -166,7 +166,7 @@ if __name__ == "__main__":
     parser.add_argument("--rgb", action='store_true', default=False, help="Export RGB image")
     parser.add_argument("--greyscale", action='store_true', default=False, help="Export Greyscale image")
     parser.add_argument("--colortable", action='store_true', default=False, help="Export colour table")
-    parser.add_argument("--nostretch", action='store_true', default=False, help="Don't stretch data (use if data has already been stretched")
+    parser.add_argument("--nostretch", action='store_true', default=False, help="Don't stretch data (use if data has already been stretched)")
     args = parser.parse_args()    
 
     ql = ExportQuicklook(args.inimage, args.width, args.height, args.invector, args.keepwld)
