@@ -71,27 +71,67 @@ def colourImage(inImage, outImage, band=1, outKMZ=None):
     outFile.write(outXMLStr)
     outFile.close()
     
-    subprocess.call('rsgisexe -x ' + outXMLName, shell=True)
+    print('Colouring image...')
+    subprocess.call('rsgisexe -x ' + outXMLName + ' > /dev/null', shell=True)
     os.remove(outXMLName)
      
     if outKMZ is not None:
         print('Creating KMZ file...')
         subprocess.call('gdal_translate -of KMLSUPEROVERLAY {0} {1}'.format(outImage, outKMZ),shell=True)
     
+def createAnimation(outColFileList, outgif):
+    """ Create animation using imagemagick """
     
+    print('Creating GIF animation...')
+    
+    gifCMD = 'convert -delay 100 '
+    
+    titleFiles = []
+
+    for fileName in outColFileList:
+        elements = fileName.split('_')
+        depth = elements[-2] + ' ' + elements[-1].replace('.tif','')
+        # Create PNG with depth
+        outImage = fileName.replace('.tif','_title.png')
+        imout = subprocess.call('''convert {} -gravity south -strokewidth 10 -pointsize 100 -fill white -annotate 0 "{}" {} > /dev/null  2>&1'''.format(fileName, depth, outImage),shell=True)
+
+        if imout != 0:
+            raise Exception('Could not convert image, is imagemagick available?')
+
+        # Add to animation command
+        gifCMD = gifCMD + outImage + ' '
+    
+        # Add to list of title files (for removal)
+        titleFiles.append(outImage)
+
+
+    gifCMD = gifCMD + ' ' + outgif
+    
+    # Run command to create animation
+    subprocess.call(gifCMD,shell=True)
+    
+    # Remove PNG files created
+    for fileName in titleFiles:
+        os.remove(fileName)
+    
+     
 
 # Get input parameters
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--inimage", type=str, help="Input image",required=True)
-parser.add_argument("-o", "--outimage", type=str, help="Output image", required=True)
+parser.add_argument("-o", "--outimage", type=str, help="Output image (Recommended extension tif)", required=True)
 parser.add_argument("-k", "--outkmz", type=str, default=None, help="Output KMZ file (optional)")
+parser.add_argument("-g", "--outgif", type=str, default=None, help="Output GIF file showing animation of all bands (optional)")
 parser.add_argument("-b", "--band", type=int, default=1, help="Band (default = 1)")
 parser.add_argument("-a", "--allbands", action='store_true', default=False, help="Run for all bands")
 args = parser.parse_args()    
 
 if not args.allbands:
      colourImage(args.inimage, args.outimage, args.band, args.outkmz)
+     if args.outgif is not None:
+        print('WARNING: Cannot create GIF animation for a single band')
 else:
+    outColFileList = []
         
     outimageBase = os.path.splitext(args.outimage)[0]
     outimageExt = os.path.splitext(args.outimage)[1]
@@ -114,6 +154,7 @@ else:
         else:
             bandName = bandName.replace(' ','_')
     
+        print(bandName)
         outImage = outimageBase + '_' + bandName + outimageExt
     
         if args.outkmz:
@@ -122,7 +163,10 @@ else:
             outKMZ = None
     
         colourImage(args.inimage, outImage, band, outKMZ)
-          
-    
+        outColFileList.append(outImage)
 
-
+    # Create animation
+    if args.outgif is not None:
+        if outimageExt != '.tif':
+            raise Exception('Output image must be in TIFF format')
+        createAnimation(outColFileList, args.outgif)
