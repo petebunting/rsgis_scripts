@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # two_band_scatter_plot.py
 #
 # Produces 2D histogram showing a pixel-to-pixel comparison
@@ -23,6 +25,8 @@ def getData(info, inputs, outputs, otherargs):
     # Get band
     imageA = inputs.imageA[otherargs.bandA]
     imageB = inputs.imageB[otherargs.bandB]
+
+    imageB = imageB * otherargs.scale
 
     # Flattern
     imageAFlat = imageA.reshape((1,imageA.shape[0]*imageA.shape[1]))[0]
@@ -95,7 +99,7 @@ def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, 
         print('Outplot file must end in PNG or PDF') 
     
 
-def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=None, plotMin=None, plotMax=None):
+def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=None, plotMin=None, plotMax=None, scale=1):
 
     controls = applier.ApplierControls()
     
@@ -112,6 +116,7 @@ def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=N
     otherargs.bandB = bandB - 1
     otherargs.outdataA = numpy.array([],dtype=numpy.float32)
     otherargs.outdataB = numpy.array([],dtype=numpy.float32)
+    otherargs.scale = scale
     
     # Get data
     print('Extracting data')
@@ -134,7 +139,8 @@ if __name__ == "__main__":
     parser.add_argument("--plot", type=str, help="Out plot (png / pdf)", required=True)
     parser.add_argument("--plotMin", type=float, default=None, help="Minimum for plot",required=False)
     parser.add_argument("--plotMax", type=float, default=None, help="Maximum for plot",required=False)
+    parser.add_argument("--scale", type=float, default=1, help="Scaling between imageA and imageB (default=1)",required=False)
     args = parser.parse_args()    
     
-    createPlots(args.imageA, args.imageB, args.plot, args.bandA, args.bandB, args.labelA, args.labelB, args.plotMin, args.plotMax)
+    createPlots(args.imageA, args.imageB, args.plot, args.bandA, args.bandB, args.labelA, args.labelB, args.plotMin, args.plotMax, args.scale)
 
