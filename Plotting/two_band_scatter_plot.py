@@ -45,22 +45,60 @@ def getData(info, inputs, outputs, otherargs):
     otherargs.outdataA = numpy.concatenate((otherargs.outdataA, dataAB[0]))
     otherargs.outdataB = numpy.concatenate((otherargs.outdataB, dataAB[1]))
 
-def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, plotMax=None):
+def calcStats(inDataA, inDataB):
+    """ Calculate statistics for two vectors """
+    
+    outStats = {}
+    outStats['dataBias'] = numpy.mean(inDataA - inDataB)
+    outStats['dataRMSE'] = numpy.sqrt(numpy.mean((inDataA - inDataB)**2))
+
+    # Linear fit
+    slope, intercept, r_value, p_value, std_err = stats.linregress(inDataA, inDataB)
+    outStats['dataSlope'] = slope
+    outStats['dataIntercept'] = intercept
+    outStats['dataR2'] = r_value**2
+
+    print('Bias: ',round(outStats['dataBias'],2))
+    print('RMSE: ', round(outStats['dataRMSE'],2))
+    print('Slope: ', round(outStats['dataSlope'],2))
+    print('Intercept: ', round(outStats['dataIntercept'],2))
+    print('R2: ', round(outStats['dataR2'],2))
+
+    return outStats
+
+def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, plotMax=None, independentXY=False):
 
     if labelA is None:
         labelA = "Image A"
     if labelB is None:
         labelB = "Image B"
 
+    # Calc stats
+    print('#####################')
+    dataStats = calcStats(inDataA, inDataB)
+    print('#####################')
+
     # Set axis limits
     if plotMin is None:
         plotMin = numpy.min([numpy.min(inDataA),numpy.min(inDataB)])
     if plotMax is None:
         plotMax = numpy.max([numpy.max(inDataA),numpy.max(inDataB)])
+        
+    # Set axis limits
+    if independentXY:
+        plotMinX = numpy.min(inDataA)
+        plotMinY = numpy.min(inDataB)
+        plotMaxX = numpy.max(inDataA)
+        plotMaxY = numpy.max(inDataB)
+    else:
+        plotMinX = plotMin
+        plotMaxX = plotMax
+        plotMinY = plotMinX
+        plotMaxY = plotMaxX
 
     # Calculate the 2D histogram
     nbins = 200
-    histRange = [[plotMin, plotMax], [plotMin,plotMax]] 
+    histRange = [[plotMinX, plotMaxX], [plotMinY,plotMaxY]] 
     H, xedges, yedges = numpy.histogram2d(inDataA,inDataB,bins=nbins,range=histRange)
      
     # H needs to be rotated and flipped
@@ -82,8 +120,8 @@ def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, 
     plt.plot(one2oneLine, one2oneLine,'--',color='black')
 
     # Set limit
-    plt.xlim((plotMin, plotMax))
-    plt.ylim((plotMin, plotMax))
+    plt.xlim((plotMinX, plotMaxX))
+    plt.ylim((plotMinY, plotMaxY))
 
     # Label axes
     plt.xlabel(labelA)
@@ -99,7 +137,7 @@ def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, 
         print('Outplot file must end in PNG or PDF') 
     
 
-def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=None, plotMin=None, plotMax=None, scale=1):
+def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=None, plotMin=None, plotMax=None, scale=1, independentXY=False):
 
     controls = applier.ApplierControls()
     
@@ -125,7 +163,7 @@ def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=N
 
     # Produce plot
     print('Saving plot')
-    plotData(otherargs.outdataA, otherargs.outdataB, outPlot, labelA, labelB, plotMin, plotMax)
+    plotData(otherargs.outdataA, otherargs.outdataB, outPlot, labelA, labelB, plotMin, plotMax, independentXY)
 
 if __name__ == "__main__":
 
@@ -140,7 +178,8 @@ if __name__ == "__main__":
     parser.add_argument("--plotMin", type=float, default=None, help="Minimum for plot",required=False)
     parser.add_argument("--plotMax", type=float, default=None, help="Maximum for plot",required=False)
     parser.add_argument("--scale", type=float, default=1, help="Scaling between imageA and imageB (default=1)",required=False)
+    parser.add_argument("--independent_axes", action='store_true',default=False, help="Use independent min/max for image A and B (default=False)",required=False)
     args = parser.parse_args()    
     
-    createPlots(args.imageA, args.imageB, args.plot, args.bandA, args.bandB, args.labelA, args.labelB, args.plotMin, args.plotMax, args.scale)
+    createPlots(args.imageA, args.imageB, args.plot, args.bandA, args.bandB, args.labelA, args.labelB, args.plotMin, args.plotMax, args.scale, args.independent_axes)
 
