@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/users/rsg/dac/Software/bin/anaconda/bin/python
 #
 # two_band_scatter_plot.py
 #
@@ -66,7 +66,7 @@ def calcStats(inDataA, inDataB):
 
     return outStats
 
-def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, plotMax=None, independentXY=False):
+def plotData(inDataA, inDataB, outPlot=None, labelA=None, labelB=None, plotMin=None, plotMax=None, independentXY=False):
 
     if labelA is None:
         labelA = "Image A"
@@ -129,13 +129,14 @@ def plotData(inDataA, inDataB, outPlot, labelA=None, labelB=None, plotMin=None, 
     #plt.grid(True)
 
     # Save figure
-    if args.plot.find('.pdf') > 0:
+    if args.plot is None:
+        plt.show()
+    elif args.plot.find('.pdf') > 0:
         plt.savefig(args.plot, format='PDF')
     elif args.plot.find('.png') > 0:
         plt.savefig(args.plot, format='PNG',dpi=300)
     else:
         print('Outplot file must end in PNG or PDF') 
-    
 
 def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=None, plotMin=None, plotMax=None, scale=1, independentXY=False):
 
@@ -159,6 +160,9 @@ def createPlots(imageA, imageB, outPlot, bandA=1, bandB=1, labelA=None, labelB=N
     # Get data
     print('Extracting data')
     controls.progress = cuiprogress.CUIProgressBar()
+    # If necessary reproject image B to image A
+    controls.setReferenceImage(infiles.imageA)
+    controls.setResampleMethod('near')
     applier.apply(getData, infiles, outfiles, otherargs, controls=controls)
 
     # Produce plot
@@ -174,7 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("--bandB", type=int, default=1, help="Band in image B",required=False)
     parser.add_argument("--labelA", type=str,default=None, help="Label for image A", required=False)
     parser.add_argument("--labelB", type=str,default=None, help="Label for image B", required=False)
-    parser.add_argument("--plot", type=str, help="Out plot (png / pdf)", required=True)
+    parser.add_argument("--plot", type=str, help="Out plot (png / pdf) - will display if not specified", default=None, required=False)
     parser.add_argument("--plotMin", type=float, default=None, help="Minimum for plot",required=False)
     parser.add_argument("--plotMax", type=float, default=None, help="Maximum for plot",required=False)
     parser.add_argument("--scale", type=float, default=1, help="Scaling between imageA and imageB (default=1)",required=False)
