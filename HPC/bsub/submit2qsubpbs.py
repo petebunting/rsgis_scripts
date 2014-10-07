@@ -37,7 +37,7 @@ import sys
 from time import strftime
 import argparse
 
-class Submit2BSub (object):
+class Submit2QSubPBS (object):
     
     def startWithHash(self, line):
         foundHash = False
@@ -46,22 +46,22 @@ class Submit2BSub (object):
                 foundHash = True
         return foundHash
     
-    def createOutputFiles(self, inputFile, outputBase, memory, time, name):
+    def createOutputFiles(self, inputFile, outputBase, memory, time, name, workingDIR):
         inputFileList = open(inputFile, 'r')
         outFileCount = 1
         for eachLine in inputFileList:
             if (eachLine.strip() != "") and (not self.startWithHash(eachLine)):
-                outFile = open(outputBase + str("_") + str(outFileCount) + str(".lsf"), 'w')
-                outFile.write("#!/bin/bash --login\n")
-                outFile.write("#BSUB -J " + name + "_" + str(outFileCount) + str("\n"))
-                outFile.write("#BSUB -o " + name + "_" + str(outFileCount) + str(".out\n"))
-                outFile.write("#BSUB -e " + name + "_" + str(outFileCount) + str(".err\n"))
-                outFile.write("#BSUB -M " + str(int(memory)*1024) + "\n")
-                outFile.write("#BSUB -W " + time + "\n");
-                outFile.write("#BSUB -P sam0102\n")
-                outFile.write("#BSUB -n 1\n")
-                outFile.write("#BSUB -R span[ptile=1]\n\n")
-                outFile.write("ulimit -v " + str(int(memory)*1024)  + " -m " + str(int(memory)*1024)  + "\n\n")
+                outFile = open(outputBase + str("_") + str(outFileCount) + str(".pbs"), 'w')
+                outFile.write("#!/bin/bash --login\n")            
+                outFile.write("#PBS -N " + name + "_" + str(outFileCount) + str("\n"))
+                outFile.write("#PBS -e " + name + "_" + str(outFileCount) + str(".err\n"))
+                outFile.write("#PBS -o " + name + "_" + str(outFileCount) + str(".log\n"))
+                outFile.write("#PBS -l  nodes=1:ppn=1\n")
+                outFile.write("#PBS -l vmem=" + str(memory) + str("gb\n"))
+                outFile.write("#PBS -l walltime=" + str(time) + str("\n"))
+                outFile.write("#PBS -j oe\n\n")
+                
+                outFile.write("cd " + workingDIR + str("\n\n"))
                 
                 outFile.write(eachLine)
                 
@@ -70,7 +70,7 @@ class Submit2BSub (object):
                 outFile.flush()
                 outFile.close()
                 
-                command = str("bsub < ") + outputBase + str("_") + str(outFileCount) + str(".lsf")
+                command = str("qsub ") + outputBase + str("_") + str(outFileCount) + str(".pbs")
                 print(command)
                 os.system(command)
                 outFileCount+=1
@@ -80,10 +80,11 @@ class Submit2BSub (object):
         parser = argparse.ArgumentParser()
         parser.add_argument("-i", "--input", dest="inputFile", type=str, help="Input list of commands (1 per line)")
         parser.add_argument("-o", "--output", dest="outputFileBase", type=str, help="Output base name and path")
-        parser.add_argument("-m", "--memory", dest="memoryMbs", type=str, help="The amount of memory in MBs.")
-        parser.add_argument("-t", "--time", dest="timeMins", type=str, help="The time limit for the jobs.")
+        parser.add_argument("-m", "--memory", dest="memoryGbs", type=str, help="The amount of memory in Gbs.")
+        parser.add_argument("-t", "--time", dest="time", type=str, help="The time limit for the jobs (HH:MM:ss). 1 hour = 1:00:00.")
         parser.add_argument("-n", "--name", dest="processName", type=str, help="The name of the process.")
-
+        parser.add_argument("-d", "--workdir", dest="workingDIR", type=str, help="The working directory.")
+        
         args = parser.parse_args()    
 
         if args.inputFile is None:
@@ -96,12 +97,12 @@ class Submit2BSub (object):
             parser.print_help()
             sys.exit()
 
-        if args.memoryMbs is None:
+        if args.memoryGbs is None:
             print("The memory amount must be set.")
             parser.print_help()
             sys.exit()
         
-        if args.timeMins is None:
+        if args.time is None:
             print("The time (in minutes) must be set.")
             parser.print_help()
             sys.exit()
@@ -111,8 +112,13 @@ class Submit2BSub (object):
             parser.print_help()
             sys.exit()
             
-        self.createOutputFiles(args.inputFile, args.outputFileBase, args.memoryMbs, args.timeMins, args.processName)
+        if args.workingDIR is None:
+            print("A working directory must be provided.")
+            parser.print_help()
+            sys.exit()
+            
+        self.createOutputFiles(args.inputFile, args.outputFileBase, args.memoryGbs, args.time, args.processName, args.workingDIR)
 
 if __name__ == '__main__':
-    obj = Submit2BSub()
+    obj = Submit2QSubPBS()
     obj.run()
