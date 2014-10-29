@@ -49,6 +49,18 @@ class ExportQuicklook(object):
         # Resize
         self.viewer.resizeForWidgetSize(outWidth, outHeight)
 
+    def name2Path(self, inString):
+        """
+        Convert band name to valid file path
+        """
+        valid_char = '-_.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        outString = ''
+        for char in inString:
+            if valid_char.find(char) > -1:
+                outString += char
+            elif char == '':
+                outString += '_'
+        return outString
 
     def runAllBands(self, outImage):
         """ Create a separate image for all bands
@@ -69,7 +81,7 @@ class ExportQuicklook(object):
                 if bandName == "":
                     bandName = 'b' + str(band)
                 else:
-                    bandName = bandName.replace(' ','_')
+                    bandName = self.name2Path(bandName)
         
                 outImage = outimageBase + '_' + bandName + outimageExt
         
