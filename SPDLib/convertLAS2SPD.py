@@ -33,6 +33,7 @@ parser.add_argument("--dsm", action='store_true', default=False, help="Create DS
 parser.add_argument("--hillshade", action='store_true', default=False, help="Create Hillshade from DTM/DSM")
 parser.add_argument("--wkt", type=str, default=None, help="WKT file providing projection (Default = From LAS)")
 parser.add_argument("--interpolation", type=str, default="NATURAL_NEIGHBOR", help="Interpolation algorithm for DTM/DSM (Default = NATURAL_NEIGHBOR)")
+parser.add_argument("--of", type=str, default="KEA", help="Output format for rasters (Default = KEA)")
 args = parser.parse_args() 
 
 for lasfile in args.inputfile:
@@ -84,14 +85,14 @@ for lasfile in args.inputfile:
          print('Creating DTM')
          dtmCMD = ['spdinterp','--dtm','--topo',
                '--in',args.interpolation,
-               '-f','KEA','-b','1','-i',spdfile_grd,'-o',outdtm]
+               '-f',args.of,'-b','1','-i',spdfile_grd,'-o',outdtm]
          subprocess.call(dtmCMD)
          if haveRSGISLib:
             imageutils.popImageStats(outdtm,True,0.,True)
 
          if args.hillshade:
             print('Creating DTM Hillshade')
-            hillshadeCMD = ['gdaldem','hillshade','-of','KEA',
+            hillshadeCMD = ['gdaldem','hillshade','-of',args.of,
                outdtm, outdtm_hillshade]
             subprocess.call(hillshadeCMD)
             if haveRSGISLib:
@@ -104,14 +105,15 @@ for lasfile in args.inputfile:
          print('Creating DSM')
          dsmCMD = ['spdinterp','--dsm','--topo',
                '--in',args.interpolation,
-               '-f','KEA','-b','1','-i',spdfile_grd,'-o',outdsm]
+               '-f',args.of,'-b','1','-i',spdfile_grd,'-o',outdsm]
+
          subprocess.call(dsmCMD)
          if haveRSGISLib:
             imageutils.popImageStats(outdsm,True,0.,True)
 
          if args.hillshade:
             print('Creating DTM Hillshade')
-            hillshadeCMD = ['gdaldem','hillshade','-of','KEA',
+            hillshadeCMD = ['gdaldem','hillshade','-of',args.of,
                outdsm, outdsm_hillshade]
             subprocess.call(hillshadeCMD)
             if haveRSGISLib:
