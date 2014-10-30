@@ -9,6 +9,7 @@
 ###########################################################
 
 import os, sys
+import subprocess
 import osgeo.gdal as gdal
 
 def getGDALFormat(fileName):
@@ -38,7 +39,7 @@ Subsets and reprojects an image (inImage) to the same size and
 projection of a base image (baseImage).
 
 Usage:
-    python subsetImage2Image.py baseImage inImage outImage [-print]
+    python subsetImage2Image.py baseImage inImage outImage [-print | additional args] 
 
 -print : Don't run, only print gdal_translate options.
 
@@ -50,10 +51,16 @@ inLargeImage = sys.argv[2]
 outSubsetImage = sys.argv[3]
 
 dummyRun = False
+additionalArgs = ""
 
-if len(sys.argv) == 5:
+if len(sys.argv) >= 5:
     if sys.argv[4] == '-print':
         dummyRun = True
+    else:
+        i=4
+        while i < len(sys.argv):
+            additionalArgs+=sys.argv[i] 
+            i+=1
 
 
 # Get output format from name
@@ -87,5 +94,5 @@ warpCMD = 'gdalwarp ' + warpOptions + '"' + inLargeImage + '" "' + outSubsetImag
 if dummyRun:
     print(warpCMD)
 else:
-    os.system(warpCMD)
+    subprocess.call(warpCMD,shell=True)
 
