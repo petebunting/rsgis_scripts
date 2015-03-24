@@ -24,7 +24,7 @@ def create_envi_headers(inFileDIR):
     os.chdir(inFileDIR)
 
     inHHFile = glob.glob('*HH')[0]
-    inHVFile = glob.glob('*HV')
+    inHVFile = glob.glob('*HV')[0]
     inDateFile = glob.glob('*_date')[0]
     inIncFile = glob.glob('*_linci')[0]
     inMaskFile = glob.glob('*_mask')[0]
