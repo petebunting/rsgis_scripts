@@ -13,11 +13,11 @@ import csv, os, sys, re
 
 # Open CSV file
 if len(sys.argv) < 2:
-    print '''Not enough parameters provided.
+    print('''Not enough parameters provided.
 Usage:
  python load_nodeinfo.py incsv.csv out.sql
-'''
-
+''')
+    sys.exit(1)
 inFileName = sys.argv[1]
 outFileName = sys.argv[2]
 
@@ -26,19 +26,19 @@ outFile = open(outFileName,'w')
 
 
 # Skip header line
-inFile.next()
+next(inFile)
 
 # Open database connection
 
 nodeInfoInsertStr = '''INSERT INTO `Points`(ID,latitude,longitude,class)'''
 
 for line in inFile:
-    valuesStr = '''VALUES ('%s',%s,%s,'')'''%(line[0],line[37],line[36])
+    valuesStr = '''VALUES ('%s',%s,%s,'')'''%(line[0],line[9],line[10])
 
     sqlCommand = nodeInfoInsertStr + valuesStr + ';'
     outFile.write(sqlCommand)
    
 outFile.close()
 
-print '''Load to database using:
-mysql -u USER --password=PASS -D Database < %s'''%outFileName
+print('''Load to database using:
+mysql -u USER --password=PASSWORD -D DATABASE < %s'''%outFileName)

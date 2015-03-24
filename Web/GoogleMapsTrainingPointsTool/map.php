@@ -17,7 +17,9 @@
      Copyright 2013 Daniel Clewley.
 -->
 <?php
-
+    // Set list of classes
+    $classlist=array("Forest","Non-Forest","NA");
+	
     // Conect to database
     $con = mysql_connect('localhost','USERNAME','PASS');
 	if (!$con)
@@ -148,6 +150,7 @@
         <script type="text/javascript">
 var map;
 
+// Function to set up map and load in point.
 function init() {
     <?php
         // Point location - transform to map coordinate system
@@ -176,9 +179,7 @@ function init() {
     "Google Hybrid",
     {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 22, visibility: false}
     );
-    
-    map.addLayers([gsat, gphy, gmap, ghyb]);
-        
+
     var markers = new OpenLayers.Layer.Markers( "Markers" );
     
     var size = new OpenLayers.Size(20,20);
@@ -202,35 +203,20 @@ function init() {
             // Buttons to classify
             echo '<form name="getdata" action="' . $nextPage . '" method="post">';
             echo '<INPUT TYPE="BUTTON" VALUE="Previous" ONCLICK="window.location.href=\''.$prevPage.'\'">';
-            if(isset($class))
-            {
-                // If already classified - set checked to previous class
-                if($class == 'NonForest')
-                {
-                    echo '<input type="radio" name="class" value="NonForest" checked>Non-Forest &nbsp;';
-                    echo '<input type="radio" name="class" value="Forest">Forest &nbsp;';
-                    echo '<input type="radio" name="class" value="">Skip &nbsp;';
-                }
-                else if($class == 'Forest')
-                {
-                    echo '<input type="radio" name="class" value="NonForest">Non-Forest&nbsp;';
-                    echo '<input type="radio" name="class" value="Forest" checked>Forest&nbsp;';
-                    echo '<input type="radio" name="class" value="">Skip &nbsp;';
-                }
-     	       else
-        	    {
-            	    echo '<input type="radio" name="class" value="NonForest">Non-Forest &nbsp;';
-                	echo '<input type="radio" name="class" value="Forest">Forest &nbsp;';
-                	echo '<input type="radio" name="class" value="" checked>Skip &nbsp;';
-            	}
-
-       		}
-            else
-            {
-                echo '<input type="radio" name="class" value="NonForest">Non-Forest &nbsp;';
-                echo '<input type="radio" name="class" value="Forest">Forest &nbsp;';
-                echo '<input type="radio" name="class" value="" checked>Skip &nbsp;';
-            }
+	
+		    foreach($classlist as $checkclass)
+		    {
+		       if((isset($class)) && ($class == $checkclass))
+               {
+                   echo "<input type=\"radio\" name=\"class\" value=\"{$checkclass}\" checked>{$checkclass}&nbsp;";
+               }
+               else
+               {
+                   echo "<input type=\"radio\" name=\"class\" value=\"{$checkclass}\">{$checkclass}&nbsp;";
+               }
+		    }
+ 
+            echo '<input type="radio" name="class" value="">Skip &nbsp;'; 
 
             echo "<input type='submit' id='Next' name='SaveNext' onclick='decide()' value='Save + Next'>";
             echo "</form>";
