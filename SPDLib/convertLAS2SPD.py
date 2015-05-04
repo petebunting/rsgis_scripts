@@ -25,7 +25,26 @@ def printCommand(commandList):
    for arg in commandList:
       outStr += str(arg) + ' ' 
    print(outStr)
-
+    
+def getFileExtension(gdalformat):
+    """
+    A function to get the extension for a given file format 
+    (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
+    """
+    if gdalformat.lower() == "kea":
+        ext = ".kea"
+    elif gdalformat.lower() == "gtiff":
+        ext = ".tif"
+    elif gdalformat.lower() == "hfa":
+        ext = ".img"
+    elif gdalformat.lower() == "envi":
+        ext = ".dem"
+    elif gdalformat.lower() == "pcidsk":
+        ext = ".pix"
+    else:
+        raise RSGISPyException("The extension for the gdalformat specified is unknown.")
+    return ext
+ 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", nargs='+',type=str, help="Input Files(s)")
 parser.add_argument("--dtm", action='store_true', default=False, help="Create DTM")
@@ -36,6 +55,8 @@ parser.add_argument("--interpolation", type=str, default="NATURAL_NEIGHBOR", hel
 parser.add_argument("--of", type=str, default="KEA", help="Output format for rasters (Default = KEA)")
 args = parser.parse_args() 
 
+fileext = getFileExtension(args.of)
+
 for lasfile in args.inputfile:
    print('\n***Converting: {}***\n'.format(lasfile))
    basefile = os.path.splitext(lasfile)[0]
@@ -44,11 +65,10 @@ for lasfile in args.inputfile:
    spdfile = basefile + '.spd'
    spdfile_grd = basefile + '_grd.spd'
    spdfile_grd_tmp = basefile + '_grd_tmp.spd'
-   outstats = basefile + '_stats.kea'
-   outdsm = basefile + '_dsm.kea'
-   outdsm_hillshade = basefile + '_dsm_hillshade.kea'
-   outdtm = basefile + '_dtm.kea'
-   outdtm_hillshade = basefile + '_dtm_hillshade.kea'
+   outdsm = basefile + '_dsm' + fileext
+   outdsm_hillshade = basefile + '_dsm_hillshade' + fileext
+   outdtm = basefile + '_dtm' + fileext
+   outdtm_hillshade = basefile + '_dtm_hillshade' + fileext
 
    spdCMD = ['spdtranslate','--if','LAS','--of','SPD','-b',
                '1','-x','LAST_RETURN',
@@ -61,7 +81,6 @@ for lasfile in args.inputfile:
    subprocess.call(spdCMD)
 
    shutil.rmtree(temp_dir)
-   exit()
 
    # If required create DSM
    if args.dtm or args.dsm:
@@ -69,25 +88,19 @@ for lasfile in args.inputfile:
 
          print('DTM requested - classifying ground returns') 
          print(' Running Progressive Morphology Filter')
-         pmfCMD = ['spdpmfgrd', '-c','50','-r','50','-b','1','--grd','1',
-         '-i',spdfile,'-o',spdfile_grd_tmp]
+         pmfCMD = ['spdpmfgrd', 
+                  '-r','50',
+                  '--overlap','10',
+                  '--maxfilter','14', 
+                  '-i',spdfile,'-o',spdfile_grd]
          subprocess.call(pmfCMD)
-
-         print(' Running Multi-scale Curvature Algorithm')
-         mccCMD = ['spdmccgrd', '-c','50','-r','50','-b','1','--class','3',
-         '--initcurvetol','1',
-         '-i',spdfile_grd_tmp,'-o',spdfile_grd]
-         subprocess.call(mccCMD)
-
-         # Remove PMF only ground classification
-         os.remove(spdfile_grd_tmp)
 
          print('Creating DTM')
          dtmCMD = ['spdinterp','--dtm','--topo',
                '--in',args.interpolation,
                '-f',args.of,'-b','1','-i',spdfile_grd,'-o',outdtm]
          subprocess.call(dtmCMD)
-         if haveRSGISLib:
+         if haveRSGISLib and args.of == 'KEA':
             imageutils.popImageStats(outdtm,True,0.,True)
 
          if args.hillshade:
@@ -95,7 +108,7 @@ for lasfile in args.inputfile:
             hillshadeCMD = ['gdaldem','hillshade','-of',args.of,
                outdtm, outdtm_hillshade]
             subprocess.call(hillshadeCMD)
-            if haveRSGISLib:
+            if haveRSGISLib and args.of == 'KEA':
                imageutils.popImageStats(outdtm_hillshade,True,0.,True)
 
       if args.dsm: 
@@ -108,7 +121,7 @@ for lasfile in args.inputfile:
                '-f',args.of,'-b','1','-i',spdfile_grd,'-o',outdsm]
 
          subprocess.call(dsmCMD)
-         if haveRSGISLib:
+         if haveRSGISLib and args.of == 'KEA':
             imageutils.popImageStats(outdsm,True,0.,True)
 
          if args.hillshade:
@@ -116,6 +129,6 @@ for lasfile in args.inputfile:
             hillshadeCMD = ['gdaldem','hillshade','-of',args.of,
                outdsm, outdsm_hillshade]
             subprocess.call(hillshadeCMD)
-            if haveRSGISLib:
+            if haveRSGISLib and args.of == 'KEA':
                imageutils.popImageStats(outdsm_hillshade,True,0.,True)
 
