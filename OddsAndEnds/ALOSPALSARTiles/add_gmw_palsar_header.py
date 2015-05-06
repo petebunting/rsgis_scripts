@@ -8,6 +8,7 @@ format PALSAR FBD files.
 
 Dan Clewley
 """
+from __future__ import print_function
 import os
 import sys
 import re
@@ -23,12 +24,19 @@ def create_envi_headers(inFileDIR):
     # Change to input directory
     os.chdir(inFileDIR)
 
-    inHHFile = glob.glob('*HH')[0]
-    inHVFile = glob.glob('*HV')[0]
-    inDateFile = glob.glob('*_date')[0]
-    inIncFile = glob.glob('*_linci')[0]
-    inMaskFile = glob.glob('*_mask')[0]
-    inHeaderFile = glob.glob('KC*.hdr')[0]
+    try:
+        inHHFile = glob.glob('*HH')[0]
+        inHVFile = glob.glob('*HV')[0]
+        inDateFile = glob.glob('*_date')[0]
+        inIncFile = glob.glob('*_linci')[0]
+        inMaskFile = glob.glob('*_mask')[0]
+        inHeaderFile = glob.glob('KC*.hdr')[0]
+    except IndexError:
+        print('Not all expected files were found in input directory')
+        print('Found:')
+        all_files = os.listdir(inFileDIR)
+        print('\n'.join(all_files))
+        raise
 
     inHHHeaderFile = inHHFile + '.hdr'
     inHVHeaderFile = inHVFile + '.hdr'
@@ -110,13 +118,10 @@ if __name__ == '__main__':
     # Get absolute path
     tile_dir_paths = [os.path.abspath(tile) for tile in args.tiledirs]
 
-    print(tile_dir_paths)
-
     for tile_dir in tile_dir_paths:
         if os.path.isdir(tile_dir):
             try:
                 create_envi_headers(tile_dir)
                 print('Added headers for {}'.format(os.path.split(tile_dir)[-1]))
             except Exception:
-                raise
-
+                print('ERROR: No headers created for {}'.format(tile_dir), file=sys.stderr)
