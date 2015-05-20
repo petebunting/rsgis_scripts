@@ -78,7 +78,7 @@ def downloadFiles(fileListFile, failsListFile, outputPath, pauseTimeInit, fileCh
             sys.stdout.flush()
             # Pause in loop - give the server time before another connection is made...
             pauseTime = random.randint(lowPauseTime, upPauseTime)
-            print("Pausing for " + str(pauseTime) + "\n")
+            print("Pausing for " + str(pauseTime) + " seconds.\n")
             time.sleep(pauseTime)
 
 if __name__ == '__main__':
