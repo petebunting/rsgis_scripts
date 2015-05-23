@@ -1,6 +1,16 @@
+#!/usr/bin/env python
+
+"""
+CURLDownloadFileList.py
+
+A script to download files from an input list using pycurl.
+
+Author: Pete Bunting (pfb@aber.ac.uk)
+Date: 20/05/2014
+
+"""
 
 import os
-import os.path
 import argparse
 import sys
 import pycurl
@@ -102,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--pause', type=int, required=False, default=30,
                         help='''A pause between downloads, in seconds - attempt to avoid 
                                 rejection from server when doing big downloads... Note the
-                                actural pause time is randomly generated as pause time +- half 
+                                actual pause time is randomly generated as pause time +- half 
                                 pause time specified''')
                                 
     parser.add_argument('-t', '--timeout', type=int, required=False, default=28800,

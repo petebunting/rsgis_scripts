@@ -17,7 +17,8 @@ scriptsList = [
 'GDAL/subsetImage2Image.py',
 'TuiView/export_quicklook_tuiview.py',
 'classification/GenerateClassLegend.py',
-'Plotting/two_band_scatter_plot.py']
+'Plotting/two_band_scatter_plot.py',
+'Download/CURLDownloadFileList.py']
 
 setup(name='rsgis_scripts',
       scripts=scriptsList)
