@@ -24,6 +24,7 @@ import tempfile
 import rsgislib
 from rsgislib import imagecalc
 from rsgislib import imageutils
+from rsgislib import imagefilter
 
 # Set pattern to match for HH and HV files
 # If not using JAXA 25 m tiles might need to adjust this
@@ -71,7 +72,7 @@ def untar_file(in_tar_path, remove_tar=False):
 
     return file_dir
 
-def create_palsar_rgb_composite(in_tile_dir):
+def create_palsar_rgb_composite(in_tile_dir, stretchtxt, calcCoVHH, calcCoVHV):
     """
     Create scaled 8-bit RGB composite
     of HH, HV and HH/HV PALSAR data in GeoTiff format
@@ -91,33 +92,46 @@ def create_palsar_rgb_composite(in_tile_dir):
 
     # Make temp directory for intermediate files
     temp_dir = tempfile.mkdtemp(prefix='palsar_stack_')
+    #print("Temp DIR: " + temp_dir)
 
     # Create HH/HV image 
-    temp_hh_hv_file = os.path.join(temp_dir, tile_basename + '_hhhv.tif')
-
-    datatype = rsgislib.TYPE_32FLOAT
-    bandDefns = [imagecalc.BandDefn('hh', in_hh_file, 1),
-                 imagecalc.BandDefn('hv', in_hv_file, 1)]
-    imagecalc.bandMath(temp_hh_hv_file, 'hh/hv', 'GTiff', rsgislib.TYPE_32FLOAT, bandDefns) 
+    temp_3rdBand_file = ''
+    bandName = ''
+    if calcCoVHH:
+        temp_3rdBand_file = os.path.join(temp_dir, tile_basename + '_covhh.tif')
+        imagefilter.applyCoeffOfVarFilter(in_hh_file, temp_3rdBand_file, 5, 'GTiff', rsgislib.TYPE_32FLOAT)
+        bandName = 'CoVHH'
+    elif calcCoVHV:
+        temp_3rdBand_file = os.path.join(temp_dir, tile_basename + '_covhv.tif')
+        imagefilter.applyCoeffOfVarFilter(in_hv_file, temp_3rdBand_file, 5, 'GTiff', rsgislib.TYPE_32FLOAT)
+        bandName = 'CoVHV'
+    else:
+        temp_3rdBand_file = os.path.join(temp_dir, tile_basename + '_hhhv.tif')
+        bandDefns = [imagecalc.BandDefn('hh', in_hh_file, 1),
+                     imagecalc.BandDefn('hv', in_hv_file, 1)]
+        imagecalc.bandMath(temp_3rdBand_file, 'hh/hv', 'GTiff', rsgislib.TYPE_32FLOAT, bandDefns) 
+        bandName = 'HH/HV'
 
     # Create stack
     temp_stack = os.path.join(temp_dir, tile_basename + '_stack.tif')
-    bands_list = [in_hh_file, in_hv_file, temp_hh_hv_file]
-    band_names = ['HH','HV', 'HH/HV']
-    gdaltype = rsgislib.TYPE_32FLOAT
-    imageutils.stackImageBands(bands_list, band_names, temp_stack, None, 
-                                    0, 'GTiff', rsgislib.TYPE_32FLOAT) 
+    bands_list = [in_hh_file, in_hv_file, temp_3rdBand_file]
+    band_names = ['HH','HV', bandName]
+    imageutils.stackImageBands(bands_list, band_names, temp_stack, None, 0, 'GTiff', rsgislib.TYPE_32FLOAT) 
 
     # Apply stretch
-    imageutils.stretchImage(temp_stack, out_composite, False, '', True, False, 'GTiff', 
+    if stretchtxt == None:
+        imageutils.stretchImage(temp_stack, out_composite, False, '', True, False, 'GTiff', 
             rsgislib.TYPE_8INT, imageutils.STRETCH_LINEARSTDDEV, STRETCH_STDEV)
+    else:
+        imageutils.stretchImageWithStats(temp_stack, out_composite, stretchtxt, 'GTiff', 
+            rsgislib.TYPE_8INT, imageutils.STRETCH_LINEARMINMAX, 0)
 
     # Remove temp directory
     shutil.rmtree(temp_dir)
 
 if __name__ == '__main__':
     script_description = '''Create 8-bit (Byte) RGB GeoTiff from ALOS
-PALSAR tiles in the same format as thouse downloaded from:
+PALSAR tiles in the same format as those downloaded from:
 
 http://www.eorc.jaxa.jp/ALOS/en/palsar_fnf/fnf_index.htm
 
@@ -125,8 +139,16 @@ Bands are:
     Red - HH
     Green - HV
     Blue - HV/HH
+    
+or
 
-DN scaled from 0 - 255 using a {} standard deviation stretch.
+Bands are:
+    Red - HH
+    Green - HV
+    Blue - Coefficient of variance(HH | HV)
+
+
+DN scaled from 0 - 255 using a {} standard deviation stretch or via a defined text file.
 
 Files are assumed to match the pattern:
 
@@ -159,6 +181,17 @@ Create composites from untarred files:
                         help='''Remove tar.gz archive once uncompressed
                          (only use if backed up elsewhere!)''',
                         default=False)
+    
+    parser.add_argument('--stretchtxt', type=str, help='''Use a text file to specify the stretch parameters''')
+    parser.add_argument('--CoVHH',
+                        action='store_true',
+                        help='''Use coefficient of variance for the HH band''',
+                        default=False)
+    parser.add_argument('--CoVHV',
+                        action='store_true',
+                        help='''Use coefficient of variance for the HV band''',
+                        default=False)
+    
     args=parser.parse_args() 
 
     # Get list of tar.gz files (if unzipping)
@@ -187,6 +220,6 @@ Create composites from untarred files:
             if not os.path.isdir(tile_dir):
                 print('{} is not a directory'.format(tile_dir), file=sys.stderr)
         # Create composite
-        create_palsar_rgb_composite(tile_dir)
+        create_palsar_rgb_composite(tile_dir, args.stretchtxt, args.CoVHH, args.CoVHV)
 
             
