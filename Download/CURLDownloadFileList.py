@@ -34,7 +34,7 @@ def downloadProgress(download_t, download_d, upload_t, upload_d):
     sys.stdout.write("\r%s %3i%%" % ("Download:", frac*100)  )
 
 
-def downloadFiles(fileListFile, failsListFile, outputPath, pauseTimeInit, fileCheck, timeOut):
+def downloadFiles(fileListFile, failsListFile, outputPath, pauseTimeInit, fileCheck, timeOut, username=None, password=None):
     print(fileListFile)
     fileList = readFileList(fileListFile)
     #print(fileList)
@@ -59,8 +59,10 @@ def downloadFiles(fileListFile, failsListFile, outputPath, pauseTimeInit, fileCh
         
         if downloadFile:
             fp = open(os.path.join(outputPath, fileName), "wb")
+            
             curl = pycurl.Curl()
             curl.setopt(pycurl.URL, file)
+            curl.setopt(pycurl.FOLLOWLOCATION, True)
             curl.setopt(pycurl.NOPROGRESS, 0)
             curl.setopt(pycurl.PROGRESSFUNCTION, downloadProgress)
             curl.setopt(pycurl.FOLLOWLOCATION, 1)
@@ -69,6 +71,9 @@ def downloadFiles(fileListFile, failsListFile, outputPath, pauseTimeInit, fileCh
             curl.setopt(pycurl.TIMEOUT, timeOut)
             curl.setopt(pycurl.FTP_RESPONSE_TIMEOUT, 600)
             curl.setopt(pycurl.NOSIGNAL, 1)
+            if (not username is None) and (not password is None):
+                curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_ANY)
+                curl.setopt(pycurl.USERPWD, username+':'+password)
             curl.setopt(pycurl.WRITEDATA, fp)
             try:
                 print("Start time: " + time.strftime("%c"))
@@ -123,10 +128,25 @@ if __name__ == '__main__':
                         help='''Specifies that a check to see if the file being downloaded 
                                 is already within the output directory is made. If the 
                                 file is found it is not redownloaded.''')
+                                
+    parser.add_argument('--username', type=str,
+                        help='''If authentication is required provide a user name.''')
+    parser.add_argument('--password', type=str,
+                        help='''If authentication is required provide a password.''')
     
     # Call the parser to parse the arguments.
     args = parser.parse_args()
 
-    downloadFiles(args.filelist, args.failslist, args.outputpath, args.pause, (not args.nofilecheck), args.timeout)
+    if not args.username is None:
+        if args.password is None:
+            print("Password must be provided if username is provided.")
+            sys.exit()
+    
+    if not args.password is None:
+        if args.username is None:
+            print("Username must be provided if password is provided.")
+            sys.exit()
+
+    downloadFiles(args.filelist, args.failslist, args.outputpath, args.pause, (not args.nofilecheck), args.timeout, args.username, args.password)
 
 
