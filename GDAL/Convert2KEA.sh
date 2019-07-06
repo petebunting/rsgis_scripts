@@ -16,5 +16,5 @@ do
   filename=`basename ${f} .${3}`
   echo "Output: ${2}/${filename}.kea"
   gdal_translate -of KEA ${f} ${2}/${filename}.kea
-  gdalcalcstats ${2}/${filename}.kea -ignore 0
+  rsgiscalcimgstats.py -i ${2}/${filename}.kea -n 0
 done
