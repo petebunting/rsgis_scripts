@@ -34,7 +34,7 @@ scn_list = [
 "/bigdata/eodd_wales_ard/data/sen1asf/ard/S1A_IW_GRDH_1SDV_20190116T063110_20190116T063135_025499_02D3AC_E6CD-GRD_HD_504",
 "/bigdata/eodd_wales_ard/data/sen1asf/ard/S1A_IW_GRDH_1SDV_20181223T063111_20181223T063136_025149_02C70A_F4C3-GRD_HD_550"]
 
-ftp_ses = FTP('144.124.80.198', user='eogroup', passwd='aberdata')
+ftp_ses = FTP('0.0.0.0', user='xxxx', passwd='xxxx')
 ftp_ses.cwd('/PeteBunting/StevanHowe')
 for scn in scn_list:
     img_file = glob.glob(os.path.join(scn, "*_dB_osgb.tif"))
